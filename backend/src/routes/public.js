@@ -1,31 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const QRCode = require('qrcode');
 
 const Vendor = require('../models/Vendor');
 const Product = require('../models/Product');
 const Banner = require('../models/Banner');
 const Order = require('../models/Order');
 const Setting = require('../models/Setting');
+const {
+  buildGlobalVendorsUrl,
+  buildVendorMenuUrl,
+  generateQrDataUrl
+} = require('../services/qrService');
 
 async function getCentralSupportPhone() {
   const setting = await Setting.findOne({ key: 'CENTRAL_SUPPORT_PHONE' }).lean();
   return setting?.value || process.env.CENTRAL_ROCKETWHEEL_PHONE || '';
-}
-
-function getClientOrigin() {
-  return (process.env.CLIENT_ORIGIN || 'https://akhilkrishnak25.github.io/rocketwheel/').replace(/\/+$/, '');
-}
-
-function usesHashRouter() {
-  const origin = getClientOrigin();
-  return process.env.CLIENT_ROUTER_MODE === 'hash' || origin.includes('github.io');
-}
-
-function buildClientUrl(path) {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const hashPrefix = usesHashRouter() ? '/#' : '';
-  return `${getClientOrigin()}${hashPrefix}${normalizedPath}`;
 }
 
 // Global vendors discovery grouped by category
@@ -81,8 +70,8 @@ router.get('/support', async (req, res) => {
 // Global QR (links to /vendors)
 router.get('/qr/global', async (req, res) => {
   try {
-    const url = buildClientUrl('/vendors');
-    const dataUrl = await QRCode.toDataURL(url);
+    const url = buildGlobalVendorsUrl();
+    const dataUrl = await generateQrDataUrl(url);
     res.json({ dataUrl, url });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -95,8 +84,8 @@ router.get('/qr/vendor/:vendorId', async (req, res) => {
     const vendor = await Vendor.findById(req.params.vendorId);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
 
-    const url = buildClientUrl(`/menu/${vendor._id}`);
-    const dataUrl = await QRCode.toDataURL(url);
+    const url = buildVendorMenuUrl(vendor._id);
+    const dataUrl = await generateQrDataUrl(url);
 
     // Persist the most recent QR so old localhost links get replaced.
     if (vendor.qrDataUrl !== dataUrl) {

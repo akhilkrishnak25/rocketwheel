@@ -12,21 +12,10 @@ const Admin = require('../models/Admin');
 const Order = require('../models/Order');
 const Setting = require('../models/Setting');
 const { verifyToken, adminAuth } = require('../middleware/auth');
-
-function getClientOrigin() {
-  return (process.env.CLIENT_ORIGIN || 'https://akhilkrishnak25.github.io/rocketwheel/').replace(/\/+$/, '');
-}
-
-function usesHashRouter() {
-  const origin = getClientOrigin();
-  return process.env.CLIENT_ROUTER_MODE === 'hash' || origin.includes('github.io');
-}
-
-function buildClientUrl(path) {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const hashPrefix = usesHashRouter() ? '/#' : '';
-  return `${getClientOrigin()}${hashPrefix}${normalizedPath}`;
-}
+const {
+  buildVendorMenuUrl,
+  generateQrDataUrl
+} = require('../services/qrService');
 
 // Admin login
 router.post('/login', async (req, res) => {
@@ -59,14 +48,13 @@ router.get('/vendors', verifyToken, adminAuth, async (req, res) => {
 });
 
 // Approve vendor and generate QR
-const QRCode = require('qrcode');
 router.post('/vendors/:id/approve', verifyToken, adminAuth, async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.params.id);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
     vendor.approved = true;
-    const url = buildClientUrl(`/menu/${vendor._id}`);
-    vendor.qrDataUrl = await QRCode.toDataURL(url);
+    const url = buildVendorMenuUrl(vendor._id);
+    vendor.qrDataUrl = await generateQrDataUrl(url);
     await vendor.save();
     res.json({ success: true, vendor });
   } catch (err) {
