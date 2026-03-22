@@ -13,6 +13,21 @@ const Order = require('../models/Order');
 const Setting = require('../models/Setting');
 const { verifyToken, adminAuth } = require('../middleware/auth');
 
+function getClientOrigin() {
+  return (process.env.CLIENT_ORIGIN || 'http://localhost:3000').replace(/\/+$/, '');
+}
+
+function usesHashRouter() {
+  const origin = getClientOrigin();
+  return process.env.CLIENT_ROUTER_MODE === 'hash' || origin.includes('github.io');
+}
+
+function buildClientUrl(path) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const hashPrefix = usesHashRouter() ? '/#' : '';
+  return `${getClientOrigin()}${hashPrefix}${normalizedPath}`;
+}
+
 // Admin login
 router.post('/login', async (req, res) => {
   try {
@@ -50,7 +65,7 @@ router.post('/vendors/:id/approve', verifyToken, adminAuth, async (req, res) => 
     const vendor = await Vendor.findById(req.params.id);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
     vendor.approved = true;
-    const url = `${process.env.CLIENT_ORIGIN || 'http://localhost:3000'}/menu/${vendor._id}`;
+    const url = buildClientUrl(`/menu/${vendor._id}`);
     vendor.qrDataUrl = await QRCode.toDataURL(url);
     await vendor.save();
     res.json({ success: true, vendor });

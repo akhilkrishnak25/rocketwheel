@@ -13,6 +13,21 @@ async function getCentralSupportPhone() {
   return setting?.value || process.env.CENTRAL_ROCKETWHEEL_PHONE || '';
 }
 
+function getClientOrigin() {
+  return (process.env.CLIENT_ORIGIN || 'http://localhost:3000').replace(/\/+$/, '');
+}
+
+function usesHashRouter() {
+  const origin = getClientOrigin();
+  return process.env.CLIENT_ROUTER_MODE === 'hash' || origin.includes('github.io');
+}
+
+function buildClientUrl(path) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const hashPrefix = usesHashRouter() ? '/#' : '';
+  return `${getClientOrigin()}${hashPrefix}${normalizedPath}`;
+}
+
 // Global vendors discovery grouped by category
 router.get('/vendors', async (req, res) => {
   try {
@@ -66,7 +81,7 @@ router.get('/support', async (req, res) => {
 // Global QR (links to /vendors)
 router.get('/qr/global', async (req, res) => {
   try {
-    const url = `${process.env.CLIENT_ORIGIN || 'http://localhost:3000'}/vendors`;
+    const url = buildClientUrl('/vendors');
     const dataUrl = await QRCode.toDataURL(url);
     res.json({ dataUrl, url });
   } catch (err) {
@@ -79,12 +94,17 @@ router.get('/qr/vendor/:vendorId', async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.params.vendorId);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
-    if (!vendor.qrDataUrl) {
-      const url = `${process.env.CLIENT_ORIGIN || 'http://localhost:3000'}/menu/${vendor._id}`;
-      vendor.qrDataUrl = await QRCode.toDataURL(url);
+
+    const url = buildClientUrl(`/menu/${vendor._id}`);
+    const dataUrl = await QRCode.toDataURL(url);
+
+    // Persist the most recent QR so old localhost links get replaced.
+    if (vendor.qrDataUrl !== dataUrl) {
+      vendor.qrDataUrl = dataUrl;
       await vendor.save();
     }
-    res.json({ dataUrl: vendor.qrDataUrl });
+
+    res.json({ dataUrl, url });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
