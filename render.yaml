@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: rocketwheel-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+
+  - type: static
+    name: rocketwheel-frontend
+    rootDir: frontend
+    buildCommand: npm install ; CI=false npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
+      - key: REACT_APP_CENTRAL_PHONE
+        sync: false
+
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

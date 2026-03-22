@@ -1,0 +1,2057 @@
+================================================================================
+                    ROCKETWHEEL SYSTEM - COMPLETE WORKFLOW
+================================================================================
+
+Project: RocketWheel QR-Based Digital Menu & Delivery Management System
+Version: 1.0.0
+Status: PRODUCTION READY
+Date: March 20, 2026
+
+================================================================================
+                              TABLE OF CONTENTS
+================================================================================
+
+1. SYSTEM OVERVIEW
+2. USER ROLES & WORKFLOWS
+3. COMPLETE CUSTOMER JOURNEY
+4. ADMIN WORKFLOW
+5. VENDOR WORKFLOW
+6. DELIVERY BOY WORKFLOW
+7. TECHNICAL WORKFLOW
+8. INSTALLATION & SETUP WORKFLOW
+9. DEPLOYMENT WORKFLOW
+10. DAILY OPERATIONS WORKFLOW
+
+================================================================================
+                            1. SYSTEM OVERVIEW
+================================================================================
+
+PROJECT NAME: RocketWheel
+DESCRIPTION: A centralized web-based platform for managing multi-vendor menus 
+             and WhatsApp-based ordering via RocketWheel delivery service.
+
+KEY FEATURES:
+- Multi-vendor management system
+- QR code-based ordering (global and vendor-specific)
+- WhatsApp integration for order delivery
+- Admin dashboard for system management
+- Vendor dashboard for business operations
+- Restaurant photo uploads
+- Professional blue/white theme UI
+- Responsive design across all devices
+
+TECHNOLOGY STACK:
+- Backend: Node.js + Express.js
+- Database: MongoDB + Mongoose
+- Frontend: React 18 + Bootstrap 5
+- Authentication: JWT tokens
+- File Management: Multer
+- QR Generation: qrcode library
+- Excel Processing: xlsx library
+
+================================================================================
+                        2. USER ROLES & WORKFLOWS
+================================================================================
+
+FOUR MAIN USER ROLES:
+
+A) ADMIN (System Administrator)
+   - Manages vendors (approve/reject/enable/disable)
+   - Manages delivery boys
+   - Assigns delivery boys to vendors
+   - Uploads promotional banners
+   - Views all system data and orders
+   - Access: /admin/login, /admin/dashboard
+
+B) VENDOR (Restaurant Owner)
+   - Self-registers (awaits admin approval)
+   - Uploads restaurant photos
+   - Manages product menu
+   - Bulk uploads products via Excel
+   - Generates QR codes for customers
+   - Views orders for their restaurant
+   - Access: /vendor/login, /vendor/dashboard, /menu/:vendorId
+
+C) CUSTOMER (End User - No Login)
+   - Browses vendors by category
+   - Searches vendors by name/location
+   - Scans global QR → views all vendors
+   - Scans vendor QR → views vendor menu
+   - Adds items to cart
+   - Places orders via WhatsApp
+   - No registration required
+   - Access: /, /menu/:vendorId
+
+D) DELIVERY BOY (RocketWheel Staff)
+   - Receives orders via WhatsApp messages
+   - Tracks delivery status
+   - Can be vendor-specific or central
+   - No direct system access (WhatsApp-based)
+
+================================================================================
+                    3. COMPLETE CUSTOMER JOURNEY
+================================================================================
+
+STEP 1: CUSTOMER DISCOVERY
+─────────────────────────
+Action: Customer opens the application
+Path: http://localhost:3000/ (home page)
+Screen: Vendors.jsx
+What They See:
+  - List of all vendors with restaurant photos
+  - Search bar (search by vendor name/location)
+  - Category filters
+  - Blue/white themed interface
+  - Each vendor card shows:
+    * Restaurant name
+    * Restaurant photo (if uploaded)
+    * Category badge (light blue background)
+    * Rating/reviews (if available)
+    * Location information
+
+User Options:
+  Option 1: Browse vendors by scrolling
+  Option 2: Use search bar to find specific vendor
+  Option 3: Filter by category
+  Option 4: Scan vendor-specific QR code
+  Option 5: Scan global QR code
+
+─────────────────────────
+
+STEP 2: VENDOR SELECTION
+────────────────────────
+Action: Customer clicks on a vendor card
+Event: onClick handler triggers
+Path: Navigates to /menu/:vendorId
+Screen: VendorMenu.jsx
+What They See:
+  - Vendor name and restaurant photo at top
+  - List of all products/menu items
+  - Product details:
+    * Product name
+    * Product image (if uploaded)
+    * Price
+    * Description
+  - Blue/white theme applied
+  - Add to Cart button for each item
+  - Cart display on right side (or bottom on mobile)
+
+─────────────────────────
+
+STEP 3: BROWSE MENU
+───────────────────
+Action: Customer scrolls through menu
+Events: Views product details
+Features Available:
+  - View product image
+  - Read product description
+  - See product price
+  - Read customer reviews (if enabled)
+  - Hover effects (blue gradient, lift effect)
+  - Product quantity selector (after add to cart)
+
+─────────────────────────
+
+STEP 4: ADD TO CART
+───────────────────
+Action: Customer clicks "Add to Cart" button
+Event: Item added to cart state
+Cart Updates With:
+  - Item name
+  - Item price
+  - Quantity (1 initially)
+  - Subtotal
+Total Price Calculation:
+  - Sum of (price × quantity) for all items
+  - Display in cart summary
+
+Features:
+  - Increase/decrease quantity
+  - Remove item button
+  - Live cart total update
+  - Cart item count badge
+
+─────────────────────────
+
+STEP 5: CHECKOUT & REVIEW
+──────────────────────────
+Action: Customer clicks "Checkout" button
+Screen: Order confirmation section
+Review Items:
+  - All items in cart with prices
+  - Total amount
+  - Vendor name and restaurant address
+  - Delivery address (input field)
+  - Instructions (input field)
+
+Required Information:
+  - Delivery address (required)
+  - Special instructions (optional)
+  - Customer name (required)
+  - Customer phone number (required for delivery contact)
+
+─────────────────────────
+
+STEP 6: ROCKETWHEEL DELIVERY ORDER PLACEMENT
+──────────────────────────────────────────────
+🎯 CORE PRINCIPLE:
+  ✅ WhatsApp messages sent ONLY to RocketWheel Delivery System
+  ❌ Vendors do NOT receive WhatsApp orders
+  📍 Restaurants prepare food (no system integration)
+  🚴 Delivery boys handle customer interaction
+
+Action: Customer clicks "Order via RocketWheel Delivery"
+System Workflow:
+  1. Generate unique order ID (e.g., RW12345)
+  2. Save order to database with status "Pending"
+  3. Validate delivery phone number
+  4. Determine correct delivery phone:
+     - PRIORITY 1: Assigned Delivery Boy Phone (for this vendor)
+     - PRIORITY 2: Central RocketWheel Number (fallback)
+     - ❌ NEVER use vendor phone
+  5. Format order message for DELIVERY with:
+     - Order ID
+     - Vendor name
+     - Restaurant address (pickup location)
+     - All items with prices (formatted clearly)
+     - Total amount
+     - Customer name
+     - Customer phone
+     - Delivery address
+     - Special instructions
+     - Note: "Restaurant is not notified. Please handle pickup and delivery."
+  6. Create WhatsApp link to delivery number only
+  7. Open WhatsApp with pre-filled message
+
+FINAL MESSAGE FORMAT (Delivery Only):
+  "Hello RocketWheel,
+
+   New Delivery Order:
+
+   Order ID: RW12345
+
+   Vendor: ABC Hotel
+
+   Items:
+   - Chicken Biryani x2 = ₹300 x 2 = ₹600
+   - Coke x1 = ₹50 x 1 = ₹50
+
+   Total Amount: ₹650
+
+   Pickup Location: ABC Hotel (Restaurant Address)
+
+   Customer Name: Satya
+   Phone: 9876543210
+   Delivery Address: XYZ Street
+
+   Note: Restaurant is not notified. Please handle pickup and delivery.
+
+   Please confirm delivery."
+
+Delivery Phone Priority Logic:
+  ✅ PRIORITY 1: Assigned Delivery Boy Phone
+  └─> If vendor has delivery boy assigned to them
+  └─> Order goes to delivery boy's WhatsApp
+  
+  ✅ PRIORITY 2: Central RocketWheel Number
+  └─> If no delivery boy assigned
+  └─> Order goes to central coordination team
+  
+  ❌ NEVER: Vendor Phone
+  └─> Vendors do NOT receive WhatsApp orders
+  └─> Vendors only see orders in their dashboard
+  └─> Delivery boy places verbal order at restaurant
+
+─────────────────────────
+
+STEP 7: ORDER CONFIRMATION
+────────────────────────────
+After WhatsApp Opens:
+  - Customer sees WhatsApp chat window
+  - Pre-filled message to RocketWheel Delivery shows order details
+  - Customer can review and send message
+  - System records order in database as "Pending"
+  - Confirmation screen shows:
+    * Order ID (e.g., RW12345)
+    * Vendor name
+    * Total amount
+    * Estimated delivery time
+    * "Order sent to RocketWheel Delivery" message
+    * Success message with order details
+    * Delivery status tracking info
+
+Customer Can Now:
+  - Share order confirmation with others
+  - Copy order ID for reference
+  - Return to home page to place another order
+  - Continue shopping at same vendor
+  - Track delivery via WhatsApp (delivery boy will update)
+  - Close browser
+
+📌 IMPORTANT NOTE:
+  ✅ Order is confirmed in system
+  ✅ Delivery boy receives WhatsApp message
+  ✅ Restaurant is NOT directly notified
+  🚴 Delivery boy will place order verbally at restaurant
+  📲 Customer will communicate with delivery boy via WhatsApp
+
+================================================================================
+                          4. ADMIN WORKFLOW
+================================================================================
+
+ADMIN ACCESS
+────────────
+URL: http://localhost:3000/admin/login
+Credentials: Admin username and password (set up during installation)
+Authentication: JWT token stored in local storage
+
+─────────────────────────
+
+STEP 1: ADMIN LOGIN
+───────────────────
+Screen: AdminLogin.jsx
+Actions:
+  1. Enter admin username/email
+  2. Enter admin password
+  3. Click "Login" button
+  4. System validates credentials
+  5. If valid, JWT token generated
+  6. Redirect to /admin/dashboard
+  7. If invalid, show error message
+
+Security:
+  - Password hashing with bcryptjs
+  - JWT token authentication
+  - Token stored securely in localStorage
+
+─────────────────────────
+
+STEP 2: ADMIN DASHBOARD - MAIN SCREEN
+──────────────────────────────────────
+Screen: AdminDashboard.jsx
+Components Visible:
+  - Blue header with admin name
+  - Navigation tabs:
+    * Vendors Tab (default)
+    * Delivery Boys Tab
+    * Orders Tab
+    * Categories Tab
+    * Banners Tab
+  - Tab content displays based on selection
+  - Logout button in header
+
+─────────────────────────
+
+STEP 3: VENDORS MANAGEMENT
+──────────────────────────
+Tab: Vendors Tab
+Table Displays:
+  - Vendor Name
+  - Category
+  - Location/Phone
+  - Registration Date
+  - Status (Approved/Pending/Disabled)
+  - Actions (Approve, Reject, Enable, Disable, Delete)
+
+Actions Available:
+
+A) APPROVE PENDING VENDOR:
+   1. Click "Approve" button on pending vendor row
+   2. Confirmation dialog appears
+   3. Confirm approval
+   4. Backend:
+      - Update vendor status to "approved"
+      - Generate QR code for vendor
+      - Save QR to database
+   5. Frontend: Table updates, status shows "Approved"
+   6. Vendor can now login and start operations
+
+B) REJECT VENDOR:
+   1. Click "Reject" button on pending vendor
+   2. Confirmation dialog with optional reason
+   3. System sends rejection notification
+   4. Vendor record can be archived
+
+C) ENABLE/DISABLE VENDOR:
+   1. Click "Disable" on active vendor to pause operations
+   2. Click "Enable" on disabled vendor to reactivate
+   3. Updates reflected immediately in customer listing
+   4. Disabled vendors don't appear on home page
+
+D) DELETE VENDOR:
+   1. Click "Delete" button
+   2. Confirmation dialog (warning about data loss)
+   3. If confirmed:
+      - All vendor data removed
+      - Products deleted
+      - Orders archived
+   4. Vendor removed from system
+
+─────────────────────────
+
+STEP 4: DELIVERY BOYS MANAGEMENT
+─────────────────────────────────
+Tab: Delivery Boys Tab
+Table Displays:
+  - Delivery Boy Name
+  - Phone Number
+  - Assigned Vendor(s)
+  - Status (Active/Inactive)
+  - Actions (Edit, Assign, Remove)
+
+📌 IMPORTANT:
+  ✅ Delivery boys receive WhatsApp orders from customers
+  ✅ Delivery boys go to restaurant and place verbal order
+  ❌ Restaurants do NOT receive WhatsApp orders
+  🚴 Delivery boy handles entire order process
+
+Actions Available:
+
+A) ADD NEW DELIVERY BOY:
+   1. Click "Add Delivery Boy" button
+   2. Modal/Form opens with fields:
+      - Name
+      - Phone Number (with country code, e.g., +92300XXXXXX)
+      - Email (optional)
+      - Vehicle info (optional)
+   3. Fill in details
+   4. Click "Save"
+   5. System creates delivery boy record
+   6. Assigns unique ID
+   7. Delivery boy now ready for assignment
+
+B) ASSIGN RESTAURANTS TO DELIVERY BOY:
+   1. Click "Assign" or "Manage Restaurants" button on delivery boy
+   2. Modal opens with:
+      - List of all vendors/restaurants
+      - Checkboxes for each restaurant
+      - Currently assigned restaurants marked with ✓
+   3. Select/deselect restaurants as needed:
+      - Check box to add restaurant to delivery boy
+      - Uncheck box to remove restaurant from delivery boy
+      - Multiple restaurants can be assigned to one delivery boy
+      - One restaurant can have multiple delivery boys
+   4. Click "Save Assignment"
+   5. System updates delivery boy's restaurant assignments
+   6. When customer orders from any assigned restaurant:
+      - Delivery boy's phone receives WhatsApp order
+      - Delivery boy goes to restaurant
+      - Places verbal order with restaurant staff
+      - Picks up food
+      - Delivers to customer
+   
+   📌 MULTI-RESTAURANT ASSIGNMENT:
+      ✅ One delivery boy can serve multiple restaurants
+      ✅ Multiple delivery boys can be assigned to one restaurant
+      ✅ Easy reassignment of restaurants
+      ✅ Flexible scheduling and coverage
+   
+   📌 NOTE: Restaurant is NOT notified by system
+             Delivery boy communicates verbally
+
+C) EDIT DELIVERY BOY:
+   1. Click "Edit" button
+   2. Form opens with current details
+   3. Update information as needed
+   4. Click "Save"
+   5. Changes reflected in system
+
+D) REMOVE DELIVERY BOY:
+   1. Click "Remove" or "Delete" button
+   2. Confirmation dialog
+   3. If confirmed:
+      - Delivery boy unassigned from all vendors
+      - Record can be archived or deleted
+      - Vendors revert to central RocketWheel number
+      - Orders for those vendors go to central coordination
+
+─────────────────────────
+
+STEP 5: ORDERS MANAGEMENT
+──────────────────────────
+Tab: Orders Tab
+Table Displays:
+  - Order ID (format: RW12345)
+  - Vendor Name
+  - Customer Name/Phone
+  - Items Ordered
+  - Total Amount
+  - Order Date/Time
+  - Status (Pending, Confirmed, Completed, Cancelled)
+  - Assigned Delivery Boy
+  - Actions (View Details, Cancel, Mark Complete)
+
+📌 ORDER FLOW:
+  1. Customer places order → Status: "Pending"
+  2. Delivery boy receives WhatsApp
+  3. Delivery boy goes to restaurant → Status: "Confirmed"
+  4. Restaurant prepares food → Vendor marks ready
+  5. Delivery boy picks up → Status: "Picked Up"
+  6. Delivery boy delivers → Status: "Completed"
+
+Actions Available:
+
+A) VIEW ORDER DETAILS:
+   1. Click on order row or "View" button
+   2. Modal opens showing:
+      - Order ID
+      - Full order details
+      - All items with prices
+      - Customer information
+      - Delivery address
+      - Special instructions
+      - Order timeline
+      - Delivery boy assigned
+      - Current status
+
+B) TRACK DELIVERY:
+   1. View delivery boy assigned
+   2. See delivery status updates
+   3. Last update timestamp
+   4. Estimated delivery time (if available)
+
+C) MARK COMPLETE:
+   1. Click "Mark Complete" button on delivered order
+   2. System records completion timestamp
+   3. Order status changes to "Completed"
+   4. Order removed from active orders (archived)
+   5. Retained for analytics and reporting
+
+D) CANCEL ORDER:
+   1. Click "Cancel" button
+   2. Confirmation dialog with reason input
+   3. If confirmed:
+      - Send cancellation message to delivery boy via WhatsApp
+      - Send cancellation message to customer
+      - Order status marked "Cancelled"
+      - Refund processed (if payment collected)
+      - Record retained for analytics
+
+─────────────────────────
+
+STEP 6: CATEGORIES MANAGEMENT
+──────────────────────────────
+Tab: Categories Tab
+Table Displays:
+  - Category Name
+  - Number of Vendors
+  - Status (Active/Inactive)
+  - Actions (Edit, Delete, View Vendors)
+
+Actions Available:
+
+A) ADD NEW CATEGORY:
+   1. Click "Add Category" button
+   2. Modal opens with fields:
+      - Category Name (e.g., "Fast Food", "Desserts")
+      - Description (optional)
+      - Icon/Image (optional)
+   3. Fill in details
+   4. Click "Save"
+   5. Category added to system
+   6. Vendors can be assigned to this category
+
+B) EDIT CATEGORY:
+   1. Click "Edit" on category
+   2. Modal opens with current details
+   3. Update information
+   4. Click "Save"
+   5. Changes reflected across system
+
+C) DELETE CATEGORY:
+   1. Click "Delete" on category
+   2. System checks for vendors in category
+   3. If vendors exist, show warning
+   4. If confirmed:
+      - Category deleted
+      - Vendors reassigned or unassigned
+      - Category removed from filters
+
+─────────────────────────
+
+STEP 7: BANNERS MANAGEMENT
+───────────────────────────
+Tab: Banners Tab
+Grid/List Displays:
+  - Banner Image
+  - Banner Title
+  - Display Status (Active/Inactive)
+  - Start Date
+  - End Date
+  - Actions (Edit, Delete, Toggle)
+
+Actions Available:
+
+A) UPLOAD NEW BANNER:
+   1. Click "Upload Banner" button
+   2. Modal opens with fields:
+      - Banner Title
+      - Banner Image (file upload)
+      - Banner URL/Link (optional)
+      - Start Date
+      - End Date
+      - Description
+   3. Select image file
+   4. Fill in details
+   5. Click "Upload"
+   6. System stores image in /uploads/banners
+   7. Banner added to rotation
+
+B) ACTIVATE/DEACTIVATE BANNER:
+   1. Click toggle button on banner
+   2. Banner status changes
+   3. Active banners display on home page
+   4. Inactive banners hidden
+
+C) DELETE BANNER:
+   1. Click "Delete" button on banner
+   2. Confirmation dialog
+   3. If confirmed:
+      - Image file deleted
+      - Banner record removed
+      - Immediately removed from home page
+
+D) EDIT BANNER:
+   1. Click "Edit" on banner
+   2. Modal opens with current details
+   3. Can update:
+      - Banner image
+      - Title
+      - URL/Link
+      - Date range
+      - Description
+   4. Click "Save"
+   5. Changes reflected immediately
+
+─────────────────────────
+
+STEP 8: ADMIN LOGOUT
+─────────────────────
+Action: Click "Logout" button in header
+System Actions:
+  1. Clear JWT token from localStorage
+  2. Clear admin session
+  3. Redirect to /admin/login
+  4. Dashboard becomes inaccessible
+
+================================================================================
+                         5. VENDOR WORKFLOW
+================================================================================
+
+VENDOR ACCESS
+─────────────
+URL: http://localhost:3000/vendor/login
+Two Options: LOGIN or REGISTER
+Authentication: JWT token for registered vendors
+
+─────────────────────────
+
+STEP 1: VENDOR REGISTRATION
+────────────────────────────
+Screen: VendorLogin.jsx - Register Tab
+Form Fields:
+  - Restaurant Name (required)
+  - Owner Name (required)
+  - Email (required)
+  - Phone Number (required)
+  - Category (dropdown select)
+  - Location/Address (required)
+  - City (required)
+  - Password (required)
+  - Confirm Password (required)
+  - Terms & Conditions (checkbox)
+
+Registration Process:
+  1. Fill all required fields
+  2. Password must be at least 8 characters
+  3. Confirm password must match
+  4. Accept terms & conditions
+  5. Click "Register" button
+  6. System validates all inputs
+  7. If validation passes:
+     - Hash password with bcryptjs
+     - Create vendor record in MongoDB
+     - Set status as "pending" (awaiting admin approval)
+     - Show success message
+     - Redirect to login
+  8. Vendor must wait for admin approval
+  9. Admin will see this vendor in Vendors tab
+  10. Once approved, vendor can login
+
+─────────────────────────
+
+STEP 2: VENDOR LOGIN
+─────────────────────
+Screen: VendorLogin.jsx - Login Tab
+Form Fields:
+  - Email (required)
+  - Password (required)
+
+Login Process:
+  1. Enter email and password
+  2. Click "Login" button
+  3. System validates credentials:
+     - Check if vendor exists
+     - Verify password hash
+     - Check if vendor is approved by admin
+     - Check if vendor is enabled
+  4. If all checks pass:
+     - Generate JWT token
+     - Store token in localStorage
+     - Set vendor session
+     - Redirect to /vendor/dashboard
+  5. If validation fails:
+     - Show error message (not approved, disabled, wrong password, etc.)
+     - Prompt to contact admin if needed
+
+─────────────────────────
+
+STEP 3: VENDOR DASHBOARD - MAIN SCREEN
+───────────────────────────────────────
+Screen: VendorDashboard.jsx
+Header Shows:
+  - Restaurant name
+  - Welcome message
+  - Logout button
+
+Navigation Tabs:
+  1. Profile Tab
+  2. Products Tab
+  3. Orders Tab
+  4. QR Code Tab
+  5. Settings Tab (optional)
+
+─────────────────────────
+
+STEP 4: PROFILE TAB
+────────────────────
+Content Displays:
+  - Restaurant name
+  - Owner name
+  - Email
+  - Phone number (for vendor contact, NOT for WhatsApp orders)
+  - Category
+  - Location/Address
+  - Restaurant photo (if uploaded)
+
+📌 IMPORTANT NOTE:
+  ✅ Vendor phone is for vendor contact ONLY
+  ❌ Vendor phone is NOT used for customer WhatsApp orders
+  📲 All orders go to RocketWheel Delivery via WhatsApp
+  🚴 Delivery boy handles pickup and delivery
+
+Features:
+
+A) UPLOAD RESTAURANT PHOTO:
+   1. Click "Upload Photo" or "Change Photo" button
+   2. File input dialog opens
+   3. Select image file (JPG, PNG, GIF)
+   4. File validation:
+      - Check file type
+      - Check file size (max 5MB)
+      - Check image dimensions
+   5. If valid:
+      - Upload to /uploads/vendors/ directory
+      - Save filename in vendor record
+      - Display photo in profile
+      - Photo also appears on:
+        * Vendor listing card on home page
+        * Customer menu page
+        * Vendor dashboard
+   6. If invalid:
+      - Show error message
+      - Allow retry
+
+B) EDIT PROFILE INFORMATION:
+   1. Click "Edit Profile" button
+   2. Form opens with current details
+   3. Update any field:
+      - Restaurant name
+      - Phone number
+      - Category
+      - Location
+      - Address details
+   4. Click "Save" button
+   5. System updates vendor record
+   6. Changes reflected across system
+
+─────────────────────────
+
+STEP 5: PRODUCTS TAB
+─────────────────────
+Content Displays:
+  - List of all products/menu items
+  - For each product:
+    * Product name
+    * Product image
+    * Price
+    * Category (if organized by category)
+    * Status (Active/Inactive)
+    * Actions (Edit, Delete)
+
+Features:
+
+A) ADD NEW PRODUCT:
+   1. Click "Add Product" button
+   2. Modal/Form opens with fields:
+      - Product Name (required)
+      - Description (optional)
+      - Price (required)
+      - Category (optional)
+      - Image Upload (optional)
+      - Availability status (in stock / out of stock)
+   3. Fill in details
+   4. Upload product image if desired
+   5. Click "Save" button
+   6. Backend:
+      - Create product record
+      - Save to MongoDB
+      - Link to vendor
+      - Store image if uploaded
+   7. Frontend:
+      - Product appears in list immediately
+      - Shows on customer menu page for this vendor
+      - Appears in search results
+
+B) EDIT PRODUCT:
+   1. Click "Edit" button on product row
+   2. Modal opens with current product details
+   3. Update any field:
+      - Name
+      - Description
+      - Price
+      - Category
+      - Image
+      - Status
+   4. Click "Save"
+   5. Changes reflected immediately:
+      - Updated on vendor menu
+      - Updated on customer facing pages
+      - Price changes take effect immediately
+
+C) DELETE PRODUCT:
+   1. Click "Delete" button on product
+   2. Confirmation dialog
+   3. If confirmed:
+      - Product record deleted
+      - Image file deleted
+      - Removed from all menus
+      - Historical orders retain product details
+   4. Product no longer available for customers
+
+D) TOGGLE PRODUCT STATUS:
+   1. Click status toggle (In Stock / Out of Stock)
+   2. Status updates immediately
+   3. If out of stock:
+      - Can-add-to-cart button may be disabled (optional)
+      - Or product shows as unavailable
+   4. Product can be reactivated by toggling back
+
+─────────────────────────
+
+STEP 6: BULK PRODUCT UPLOAD (via Excel)
+─────────────────────────────────────────
+Feature: Import products from Excel file
+Process:
+
+   1. Click "Upload Products" or "Import from Excel" button
+   2. File dialog opens
+   3. Select .xlsx or .csv file with products
+   4. Excel file format should have columns:
+      - Product Name
+      - Description
+      - Price
+      - Category
+      - Image URL (optional)
+   5. Upload file
+   6. System processes file:
+      - Parse Excel/CSV
+      - Validate each product
+      - Check for required fields
+      - Verify prices are numeric
+   7. If validation successful:
+      - Show preview of products to be added
+      - Show count of new products
+      - Ask for confirmation
+   8. If confirmed:
+      - Create all products in batch
+      - Link to vendor
+      - Download images from URLs if provided
+      - Display success message
+      - Show count of added products
+   9. All products now available in Products tab
+   10. Appear on customer menu page
+
+─────────────────────────
+
+STEP 7: ORDERS TAB
+───────────────────
+Content Displays:
+  - List of all orders for this vendor
+  - For each order:
+    * Order ID
+    * Customer Name/Phone
+    * Items ordered
+    * Total amount
+    * Order date/time
+    * Status (Pending, Completed)
+    * Actions (View Details, Mark Complete)
+
+Features:
+
+A) VIEW ORDER DETAILS:
+   1. Click on order row or "View" button
+   2. Modal opens showing:
+      - Full order details
+      - All items with quantities and prices
+      - Customer name and phone
+      - Delivery address
+      - Special instructions
+      - Order time
+      - Expected delivery time (if applicable)
+
+B) MARK ORDER COMPLETE:
+   1. Click "Mark Complete" button on order
+   2. System records completion
+   3. Order status changes to "Completed"
+   4. Order moves to completed list
+   5. Can still be viewed for reference
+
+C) FILTER/SEARCH ORDERS:
+   1. Use filter options:
+      - By date range
+      - By status (pending/completed)
+      - By customer name
+   2. Search by order ID
+   3. List updates to show filtered results
+
+─────────────────────────
+
+STEP 8: QR CODE TAB
+─────────────────────
+Content Displays:
+  - Vendor-specific QR code (auto-generated on approval)
+  - QR code image
+  - QR code URL
+  - Instructions for use
+
+Features:
+
+A) VIEW QR CODE:
+   1. QR code automatically generated when vendor approved by admin
+   2. Vendor-specific QR points to:
+      - URL: /menu/[vendorId]
+      - This opens the vendor's menu page
+   3. Code displayed as image in dashboard
+
+B) DOWNLOAD QR CODE:
+   1. Click "Download QR Code" button
+   2. Choose format:
+      - PNG (most common)
+      - JPG
+      - PDF (with logo and text)
+   3. File downloads to computer
+   4. Can print and display in restaurant
+
+C) SHARE QR CODE:
+   1. Click "Share" button
+   2. Options:
+      - Copy QR code URL to clipboard
+      - Email QR code
+      - Generate sharing link
+   3. Share with customers or print on materials
+
+D) QR CODE USAGE:
+   - Print and display in restaurant
+   - Put on physical menus
+   - Put on tables
+   - Share on social media
+   - Add to receipts
+   - Customers scan to see vendor's menu
+
+─────────────────────────
+
+STEP 9: VENDOR LOGOUT
+──────────────────────
+Action: Click "Logout" button in header
+System Actions:
+  1. Clear JWT token from localStorage
+  2. Clear vendor session
+  3. Redirect to /vendor/login
+  4. Dashboard becomes inaccessible
+
+================================================================================
+                      6. DELIVERY BOY WORKFLOW
+================================================================================
+
+🎯 DELIVERY BOY ROLE:
+  ✅ Receives orders via WhatsApp from RocketWheel system
+  ✅ Goes to restaurant and places verbal order
+  ✅ Picks up food from restaurant
+  ✅ Delivers to customer
+  ❌ Restaurant is NOT notified via system
+
+DELIVERY BOY SETUP (by Admin)
+──────────────────────────────
+
+1. Admin creates delivery boy record in Admin Dashboard
+   - Name
+   - Phone number (with country code, e.g., +92300XXXXXX)
+   - Email (optional)
+
+2. Admin assigns delivery boy to vendor(s)
+   - Links delivery boy's phone to vendor
+   - When customer places order from that vendor:
+     • Delivery boy's phone receives WhatsApp message
+     • Delivery boy goes to restaurant
+     • Places order manually (speaks to restaurant staff)
+     • Picks up food
+     • Delivers to customer
+
+─────────────────────────
+
+DELIVERY BOY ORDER RECEIPT
+────────────────────────────
+
+Customer places order:
+  1. Customer clicks "Order via RocketWheel Delivery"
+  2. WhatsApp opens with pre-filled message
+  3. Message sent to:
+     - Assigned delivery boy's phone (if linked to vendor)
+     - Central RocketWheel number (if no delivery boy assigned)
+  4. Delivery boy receives WhatsApp message with:
+     - Order ID (e.g., RW12345)
+     - Vendor name
+     - Restaurant address (for pickup)
+     - All items and prices
+     - Total amount
+     - Customer name and phone
+     - Delivery address
+     - Special instructions
+     - Note: "Restaurant is not notified. Please handle pickup and delivery."
+  5. Restaurant is NOT notified (delivery boy communicates verbally)
+
+─────────────────────────
+
+DELIVERY BOY OPERATIONS
+─────────────────────────
+
+1. RECEIVE & CONFIRM ORDER:
+   - Delivery boy receives WhatsApp message
+   - Reviews order details
+   - Confirms receipt: "Order confirmed, will pickup and deliver"
+
+2. GO TO RESTAURANT:
+   - Navigate to restaurant address from order
+   - Arrive at restaurant
+
+3. PLACE VERBAL ORDER:
+   - Speak to restaurant staff (no system notification)
+   - Provide items list from WhatsApp message
+   - Wait for food preparation
+   - Verify all items are correct
+
+4. PICK UP FOOD:
+   - Collect order items
+   - Verify packaging and quality
+   - Confirm with restaurant staff
+   - Pack items securely
+
+5. CONTACT CUSTOMER:
+   - Send WhatsApp to customer:
+     "Order picked up from [Restaurant Name]. On the way to deliver. ETA: 20 mins"
+
+6. DELIVER TO CUSTOMER:
+   - Navigate to delivery address
+   - Call customer when nearby
+   - Deliver order at address
+   - Collect payment (if Cash on Delivery)
+   - Get customer confirmation
+
+7. MARK DELIVERY COMPLETE:
+   - Send WhatsApp confirmation to customer:
+     "Order delivered. Thank you!"
+   - Send confirmation back to RocketWheel system (if app available)
+   - Order status marked "Completed" in database
+
+─────────────────────────
+
+DELIVERY BOY PHONE NUMBER PRIORITY
+──────────────────────────────────
+
+When customer places order:
+
+  ✅ PRIORITY 1: Assigned Delivery Boy Phone
+  └─> If vendor has delivery boy assigned
+  └─> Delivery boy's phone receives order WhatsApp
+  └─> Delivery boy handles entire order
+
+  ✅ PRIORITY 2: Central RocketWheel Phone
+  └─> If no delivery boy assigned to vendor
+  └─> Central team receives order WhatsApp
+  └─> Central team assigns delivery boy
+  └─> Central team forwards to delivery boy
+  
+  ❌ NEVER: Vendor Phone
+  └─> Vendors do NOT receive WhatsApp messages
+  └─> Vendors only see orders in dashboard (for reference)
+  └─> Delivery boy communicates with restaurant verbally
+
+================================================================================
+                     7. TECHNICAL WORKFLOW
+================================================================================
+
+BACKEND WORKFLOW
+─────────────────
+
+A) REQUEST HANDLING:
+
+   1. Client sends HTTP request (GET, POST, PUT, DELETE)
+   2. Express server receives request
+   3. Request routing to appropriate endpoint
+   4. Authentication middleware checks JWT token (if required)
+   5. Request validation (check input data)
+   6. Database query execution via Mongoose
+   7. Business logic processing
+   8. Response generation
+   9. Send response back to client
+   10. Client handles response
+
+B) DATABASE OPERATIONS:
+
+   Collections:
+   - vendors: All vendor/restaurant data
+   - products: All menu items
+   - orders: All orders placed
+   - deliveryboys: Delivery staff records
+   - admins: System administrators
+   - categories: Restaurant categories
+   - banners: Promotional banners
+
+   Common Operations:
+   - CREATE: Add new records (vendor, product, order)
+   - READ: Fetch records (get vendor, get products)
+   - UPDATE: Modify records (edit vendor info, update product)
+   - DELETE: Remove records (delete product, disable vendor)
+
+C) FILE UPLOAD WORKFLOW:
+
+   1. Client selects file (image)
+   2. File sent to upload endpoint
+   3. Multer middleware processes file:
+      - Check file type (MIME type validation)
+      - Check file size
+      - Save to disk in /uploads directory
+   4. Store filename in database
+   5. Return file URL to client
+   6. Client can access file via URL
+
+D) AUTHENTICATION FLOW:
+
+   1. User enters credentials (email/password)
+   2. System looks up user in database
+   3. Compare password hash with bcryptjs
+   4. If password correct:
+      - Generate JWT token
+      - Token includes user ID and role
+      - Token signed with secret key
+      - Token sent to client
+   5. Client stores token in localStorage
+   6. For protected routes:
+      - Token sent in Authorization header
+      - Server verifies token signature
+      - Token not expired
+      - User authenticated
+      - Request allowed to proceed
+   7. Logout clears token from client
+
+─────────────────────────
+
+FRONTEND WORKFLOW
+──────────────────
+
+A) COMPONENT RENDERING:
+
+   1. Browser loads index.html
+   2. React app initializes in #root element
+   3. App.jsx component renders
+   4. Router matches current URL to route
+   5. Corresponding page component renders
+   6. Page component uses hooks:
+      - useState for state management
+      - useEffect for side effects
+      - useContext for theme/user context
+   7. Components render JSX
+   8. JSX compiled to React elements
+   9. React renders to DOM
+   10. CSS applied for styling
+   11. Page displayed to user
+
+B) USER INTERACTION:
+
+   1. User clicks button or interacts with element
+   2. Event handler triggered (onClick, onChange, etc.)
+   3. Handler updates component state
+   4. Component re-renders with new state
+   5. DOM updated to reflect changes
+   6. Visual feedback shown to user
+
+C) API COMMUNICATION:
+
+   1. Component needs data from server
+   2. useEffect hook triggers
+   3. Axios makes HTTP request to backend
+   4. Request includes:
+      - URL/endpoint
+      - HTTP method
+      - Data (if POST/PUT)
+      - Headers (including JWT token)
+   5. Wait for response
+   6. Response received
+   7. Parse response data
+   8. Update component state
+   9. Component re-renders with new data
+   10. Data displayed to user
+
+─────────────────────────
+
+DATA FLOW EXAMPLE: ORDER PLACEMENT
+
+CLIENT SIDE:
+  1. Customer adds items to cart in React component
+  2. Cart state updated in component
+  3. Customer clicks "Place Order on WhatsApp"
+  4. Component collects order data:
+     - Vendor ID
+     - Items and quantities
+     - Total price
+     - Delivery address
+     - Special instructions
+  5. Validate all required fields
+  6. Determine phone number:
+     - Query backend for delivery boy phone
+     - If not available, use vendor phone
+     - If not available, use central phone
+  7. Format order message
+  8. Create WhatsApp URL with message
+  9. Open WhatsApp link in new window
+  10. Customer sends message
+
+SERVER SIDE:
+  1. Backend receives order data (optional API call)
+  2. Validate all fields
+  3. Check if vendor exists
+  4. Check if vendor enabled
+  5. Create order record in database
+  6. Generate order ID
+  7. Store order details:
+     - Vendor ID
+     - Items
+     - Total
+     - Address
+     - Timestamp
+  8. Return order ID to client
+  9. Client displays confirmation with order ID
+
+DELIVERY:
+  1. Delivery boy receives WhatsApp message
+  2. Message includes order ID
+  3. Delivery boy accepts order
+  4. Picks up from vendor
+  5. Delivers to customer
+  6. Marks complete via WhatsApp
+
+================================================================================
+                   8. INSTALLATION & SETUP WORKFLOW
+================================================================================
+
+PREREQUISITES
+──────────────
+- Node.js installed (v14 or higher)
+- MongoDB installed or MongoDB Atlas cloud account
+- Git installed (for cloning repository)
+- Code editor (VS Code recommended)
+- Terminal/Command Prompt
+- WhatsApp account for testing
+
+─────────────────────────
+
+STEP 1: CLONE/DOWNLOAD PROJECT
+────────────────────────────────
+Option A: Clone from Git
+  Command: git clone <repository-url>
+  Command: cd rocketwheel
+
+Option B: Download ZIP
+  - Download ZIP from repository
+  - Extract to desired location
+  - Open terminal in extracted folder
+
+─────────────────────────
+
+STEP 2: INSTALL BACKEND DEPENDENCIES
+──────────────────────────────────────
+Navigate to backend folder:
+  Command: cd backend
+
+Install packages:
+  Command: npm install
+
+This installs:
+  - express: Web framework
+  - mongoose: Database ORM
+  - bcryptjs: Password hashing
+  - jsonwebtoken: JWT authentication
+  - multer: File uploads
+  - qrcode: QR code generation
+  - xlsx: Excel file processing
+  - cors: Cross-origin requests
+  - dotenv: Environment variables
+  - And other dependencies
+
+─────────────────────────
+
+STEP 3: SETUP MONGODB
+───────────────────────
+Option A: Local MongoDB
+  1. Install MongoDB Community Edition
+  2. Start MongoDB service:
+     Windows: mongod
+  3. Connection string: mongodb://localhost:27017/rocketwheel
+
+Option B: MongoDB Atlas (Cloud)
+  1. Go to mongodb.com/cloud
+  2. Create account
+  3. Create cluster
+  4. Create database user
+  5. Get connection string
+  6. Connection string format:
+     mongodb+srv://username:password@cluster.mongodb.net/rocketwheel
+
+─────────────────────────
+
+STEP 4: SETUP BACKEND ENVIRONMENT VARIABLES
+─────────────────────────────────────────────
+Create file: backend/.env
+
+Content:
+  PORT=4000
+  MONGODB_URI=mongodb://localhost:27017/rocketwheel
+  JWT_SECRET=your-secret-key-min-32-characters
+  ADMIN_EMAIL=admin@rocketwheel.com
+  ADMIN_PASSWORD=adminpass123
+  CENTRAL_PHONE=+923001234567
+  NODE_ENV=development
+
+Configuration:
+  - PORT: Server port (default 4000)
+  - MONGODB_URI: Database connection string
+  - JWT_SECRET: Secret key for token signing (make it random, min 32 chars)
+  - CENTRAL_PHONE: Central delivery phone number
+  - NODE_ENV: development/production
+
+─────────────────────────
+
+STEP 5: CREATE UPLOADS DIRECTORIES
+─────────────────────────────────────
+Create directories:
+  - backend/uploads
+  - backend/uploads/products
+  - backend/uploads/vendors
+  - backend/uploads/banners
+
+These folders store uploaded images
+
+─────────────────────────
+
+STEP 6: START BACKEND SERVER
+──────────────────────────────
+Navigate to backend folder if not there:
+  Command: cd backend
+
+Start server:
+  Command: npm start
+
+Expected output:
+  - Server running on port 4000
+  - Connected to MongoDB
+  - Ready to accept requests
+
+─────────────────────────
+
+STEP 7: INSTALL FRONTEND DEPENDENCIES
+───────────────────────────────────────
+Open new terminal window
+
+Navigate to frontend folder:
+  Command: cd frontend
+
+Install packages:
+  Command: npm install
+
+This installs:
+  - react: UI library
+  - react-router-dom: Routing
+  - bootstrap: CSS framework
+  - axios: HTTP client
+  - And other dependencies
+
+─────────────────────────
+
+STEP 8: SETUP FRONTEND ENVIRONMENT VARIABLES
+───────────────────────────────────────────────
+Create file: frontend/.env.local
+
+Content:
+  REACT_APP_API_BASE_URL=http://localhost:4000/api
+  REACT_APP_CENTRAL_PHONE=+923001234567
+
+Configuration:
+  - API_BASE_URL: Backend API endpoint
+  - CENTRAL_PHONE: Fallback phone for WhatsApp orders
+
+─────────────────────────
+
+STEP 9: START FRONTEND SERVER
+───────────────────────────────
+Navigate to frontend folder:
+  Command: cd frontend
+
+Start development server:
+  Command: npm start
+
+Expected:
+  - Browser opens automatically
+  - Application loads on http://localhost:3000
+  - Hot-reload enabled (changes auto-refresh)
+
+─────────────────────────
+
+STEP 10: VERIFY INSTALLATION
+──────────────────────────────
+Check Backend:
+  - Terminal shows "Server running on port 4000"
+  - No error messages
+  - MongoDB connection successful
+
+Check Frontend:
+  - Browser displays vendor listing page
+  - Blue/white theme visible
+  - No console errors
+
+Test Basic Functionality:
+  - Home page loads vendors
+  - Click on vendor opens menu
+  - Add items to cart
+  - Review cart
+  - WhatsApp button functional
+
+─────────────────────────
+
+STEP 11: INITIALIZE ADMIN ACCOUNT
+────────────────────────────────────
+Option A: Use pre-configured admin (if set in .env)
+  Email: admin@rocketwheel.com
+  Password: adminpass123 (from .env)
+
+Option B: Create new admin via API
+  Use API testing tool (Postman/Insomnia)
+  POST /api/admin/register
+  Body: {
+    "email": "newemail@example.com",
+    "password": "newpassword123",
+    "name": "Admin Name"
+  }
+
+First admin account:
+  - Go to http://localhost:3000/admin/login
+  - Enter admin email
+  - Enter admin password
+  - Click Login
+  - Redirects to Admin Dashboard
+
+─────────────────────────
+
+STEP 12: SEED TEST DATA (OPTIONAL)
+───────────────────────────────────
+Create sample vendors, products, and categories for testing
+
+Via API:
+  1. Use Postman or similar tool
+  2. Make POST requests to create:
+     - Categories: POST /api/categories
+     - Vendors: POST /api/vendor/register
+     - Products: POST /api/products (after vendor approval)
+
+Via Excel Upload:
+  1. Create Excel file with products
+  2. Login as vendor
+  3. Upload Excel file in Products tab
+  4. Products auto-imported
+
+Manual Entry:
+  1. Login as admin
+  2. Approve sample vendors
+  3. Login as vendor
+  4. Manually add products in dashboard
+
+─────────────────────────
+
+STEP 13: TEST COMPLETE WORKFLOW
+──────────────────────────────────
+Test as Customer:
+  1. Open http://localhost:3000
+  2. Browse vendors
+  3. Click on vendor
+  4. View menu and restaurant photo
+  5. Add items to cart
+  6. Click checkout
+  7. Enter delivery details
+  8. Click "Place Order on WhatsApp"
+  9. Verify WhatsApp link opens correctly
+  10. Verify message is pre-filled
+
+Test as Admin:
+  1. Go to /admin/login
+  2. Login with admin credentials
+  3. Navigate through dashboard tabs
+  4. Test vendor approval flow
+  5. Test delivery boy management
+  6. View orders
+
+Test as Vendor:
+  1. Go to /vendor/login
+  2. Navigate to Profile tab
+  3. Upload restaurant photo
+  4. Go to Products tab
+  5. Add sample products
+  6. View QR code
+  7. Check orders
+
+================================================================================
+                      9. DEPLOYMENT WORKFLOW
+================================================================================
+
+PREPARE FOR PRODUCTION
+───────────────────────
+
+A) CODE PREPARATION:
+
+   1. Code Review:
+      - Review all files for errors
+      - Check error handling
+      - Verify security practices
+      - No console.log() for debugging
+      - No hardcoded secrets
+
+   2. Environment Variables:
+      - Change NODE_ENV to "production"
+      - Use strong JWT_SECRET
+      - Use production MongoDB URL
+      - Update CENTRAL_PHONE
+      - Set secure CORS origins
+
+   3. Database:
+      - Use MongoDB Atlas (cloud) for reliability
+      - Set up database backups
+      - Create admin user with strong password
+      - Test database connectivity
+
+   4. Build Optimization:
+      - Frontend: npm run build (creates optimized build)
+      - Remove unused dependencies
+      - Minify and compress assets
+
+─────────────────────────
+
+BACKEND DEPLOYMENT
+────────────────────
+
+Option 1: Deploy to Heroku
+
+   1. Create Heroku account at heroku.com
+   2. Install Heroku CLI
+   3. Login: heroku login
+   4. Create app: heroku create app-name
+   5. Set environment variables:
+      heroku config:set PORT=4000
+      heroku config:set MONGODB_URI=<your-atlas-url>
+      heroku config:set JWT_SECRET=<strong-secret>
+   6. Deploy: git push heroku main
+   7. App accessible at: https://app-name.herokuapp.com
+
+Option 2: Deploy to AWS
+
+   1. Create EC2 instance
+   2. SSH into instance
+   3. Install Node.js
+   4. Clone repository
+   5. Install dependencies
+   6. Set environment variables
+   7. Start server with PM2 (process manager)
+   8. Configure SSL certificate
+   9. Set up nginx reverse proxy
+
+Option 3: Deploy to DigitalOcean
+
+   1. Create droplet
+   2. SSH into droplet
+   3. Install Node.js and MongoDB
+   4. Clone repository
+   5. Install dependencies
+   6. Configure .env for production
+   7. Use PM2 to manage process
+   8. Configure domain and SSL
+
+Option 4: Deploy to Azure
+
+   1. Create Azure App Service
+   2. Connect to GitHub repository
+   3. Configure deployment settings
+   4. Set environment variables
+   5. Deploy automatically from git push
+
+─────────────────────────
+
+FRONTEND DEPLOYMENT
+─────────────────────
+
+Option 1: Deploy to Vercel
+
+   1. Create account at vercel.com
+   2. Connect GitHub repository
+   3. Configure build settings
+   4. Set environment variables
+   5. Deploy automatically on git push
+   6. Domain configured automatically
+
+Option 2: Deploy to Netlify
+
+   1. Create account at netlify.com
+   2. Connect GitHub repository
+   3. Set build command: npm run build
+   4. Set publish directory: build
+   5. Set environment variables
+   6. Deploy automatically
+   7. Configure custom domain
+
+Option 3: Deploy to AWS S3 + CloudFront
+
+   1. Create S3 bucket
+   2. Build frontend: npm run build
+   3. Upload build files to S3
+   4. Create CloudFront distribution
+   5. Point distribution to S3
+   6. Configure domain with CloudFront
+   7. Enable SSL/TLS
+
+Option 4: Deploy to your own server
+
+   1. Build frontend: npm run build
+   2. Copy build folder to server
+   3. Use nginx to serve static files
+   4. Configure reverse proxy to backend
+   5. Set up SSL certificate
+   6. Configure domain DNS
+
+─────────────────────────
+
+DATABASE DEPLOYMENT
+─────────────────────
+
+Use MongoDB Atlas (recommended):
+
+   1. Go to mongodb.com/cloud
+   2. Create project
+   3. Create cluster
+      - Choose free tier or paid
+      - Select region close to users
+   4. Create database user
+      - Set strong password
+      - Save credentials securely
+   5. Get connection string
+      - Format: mongodb+srv://username:password@cluster.mongodb.net/dbname
+   6. Update MONGODB_URI in production .env
+   7. Enable network access
+      - Add production server IP to whitelist
+      - Or allow all IPs (less secure)
+
+Backups:
+   - MongoDB Atlas auto-backs up data
+   - Can restore from snapshots
+   - Set up additional backups if needed
+
+─────────────────────────
+
+POST-DEPLOYMENT VERIFICATION
+──────────────────────────────
+
+1. TEST ALL ENDPOINTS:
+   - Use Postman or cURL to test each API endpoint
+   - Verify response formats
+   - Check error handling
+
+2. TEST COMPLETE WORKFLOWS:
+   - Customer flow: Browse → Order → WhatsApp
+   - Admin flow: Login → Manage vendors → Manage orders
+   - Vendor flow: Register → Approve → Upload products
+
+3. SECURITY CHECK:
+   - Verify JWT authentication working
+   - Check file upload restrictions
+   - Verify CORS settings
+   - Test password hashing
+   - Verify no secrets exposed
+
+4. PERFORMANCE TESTING:
+   - Check page load times
+   - Test with multiple concurrent users
+   - Monitor server CPU and memory
+   - Test database query performance
+
+5. MONITOR LOGS:
+   - Check error logs
+   - Monitor API response times
+   - Track failed requests
+   - Set up alerts for critical errors
+
+================================================================================
+                   10. DAILY OPERATIONS WORKFLOW
+================================================================================
+
+ADMIN DAILY TASKS
+──────────────────
+
+1. MORNING CHECKLIST (Start of Day):
+   ☐ Check system status
+   ☐ Review pending vendor registrations
+   ☐ Verify all vendors operational
+   ☐ Check for any error alerts
+   ☐ Monitor database size
+
+2. THROUGHOUT DAY:
+   ☐ Approve new vendor registrations
+   ☐ Monitor incoming orders
+   ☐ Handle vendor support requests
+   ☐ Manage delivery boy assignments
+   ☐ Monitor system performance
+
+3. VENDOR APPROVAL WORKFLOW:
+   a. New vendor registers
+   b. Appears in Admin Dashboard - Vendors tab with "Pending" status
+   c. Admin reviews vendor details
+   d. If approved:
+      - Click "Approve" button
+      - Confirmation dialog
+      - System generates QR code
+      - Vendor notified (optional)
+      - Vendor can now login and add products
+   e. If rejected:
+      - Click "Reject" button
+      - Optional reason provided
+      - Vendor record archived
+
+4. ORDER MONITORING:
+   a. Customers place orders via WhatsApp
+   b. Delivery boys receive messages
+   c. Admin monitors in Orders tab
+   d. See order status, vendor, customer, items
+   e. Track delivery progress
+   f. Mark complete when delivered
+
+5. EVENING CHECKLIST (End of Day):
+   ☐ Archive completed orders
+   ☐ Check database backup completed
+   ☐ Review daily statistics
+   ☐ Note any issues for next day
+   ☐ Ensure no critical alerts
+
+─────────────────────────
+
+VENDOR DAILY OPERATIONS
+─────────────────────────
+
+1. MORNING CHECKLIST:
+   ☐ Login to vendor dashboard
+   ☐ Check for new orders (from delivery boys)
+   ☐ Review product availability
+   ☐ Check restaurant photo display
+   ☐ Verify QR code still working
+   ☐ Ensure restaurant is ready for deliveries
+
+2. THROUGHOUT DAY:
+   ☐ Monitor incoming orders in dashboard
+   ☐ Update product availability
+   ☐ Adjust prices if needed
+   ☐ Add new menu items
+   ☐ Prepare for delivery boys picking up orders
+
+3. ORDER MANAGEMENT (From Delivery Boys):
+   a. Delivery boy arrives at restaurant
+   b. Places verbal order based on customer details
+   c. Restaurant prepares items
+   d. Delivery boy picks up food
+   e. Vendor can see order status in dashboard
+   f. Mark order as prepared when ready for pickup
+   g. Confirm with delivery boy when handing over food
+
+4. PRODUCT UPDATES:
+   a. Need to add new items?
+      - Go to Products tab
+      - Click Add Product
+      - Enter details and image
+      - Click Save
+   b. Price changes?
+      - Click Edit on product
+      - Update price
+      - Click Save (immediate effect for future orders)
+   c. Out of stock?
+      - Click status toggle
+      - Set to "Out of Stock"
+      - Customers won't be able to add to cart
+
+5. EVENING CHECKLIST:
+   ☐ Review all orders for the day in dashboard
+   ☐ Mark all prepared orders as completed
+   ☐ Check product inventory for tomorrow
+   ☐ Verify restaurant photo looks good
+   ☐ Note any issues with delivery boys
+   ☐ Plan menu updates if needed
+
+📌 NOTE:
+  ✅ Restaurant receives orders via dashboard and delivery boy visits
+  ❌ Restaurant does NOT receive WhatsApp orders
+  🚴 Delivery boy communicates verbally
+  📦 Restaurant prepares food, delivery boy delivers
+
+─────────────────────────
+
+CUSTOMER-FACING DAILY OPERATIONS
+──────────────────────────────────
+
+Morning: Customers start using app
+  1. Visit http://localhost:3000
+  2. Browse vendors by category
+  3. See restaurant photos
+  4. Check available items
+  5. Make purchasing decisions
+
+Ordering Process Throughout Day:
+  1. Find desired vendor
+  2. Click vendor card
+  3. Browse menu items
+  4. Add items to cart
+  5. Review cart total
+  6. Click "Checkout"
+  7. Enter delivery address
+  8. Click "Order via RocketWheel Delivery"
+  9. Pre-filled WhatsApp message opens
+  10. Send message to RocketWheel Delivery
+  11. Receive order confirmation with Order ID
+
+Order Tracking (Via WhatsApp):
+  1. Order ID provided in confirmation (e.g., RW12345)
+  2. Keep order ID handy
+  3. Delivery boy receives order via WhatsApp
+  4. Delivery boy goes to restaurant
+  5. Delivery boy places order with restaurant staff
+  6. Delivery boy picks up food
+  7. Delivery boy contacts customer:
+     "Order picked up from [Restaurant]. On the way!"
+  8. Delivery boy delivers to address
+  9. Delivery boy confirms delivery:
+     "Order delivered. Thank you!"
+
+📌 IMPORTANT:
+  ✅ Customer communicates with RocketWheel Delivery Boy
+  ❌ Customer does NOT contact restaurant directly
+  🚴 Delivery boy handles all pickup and delivery
+  📱 WhatsApp is primary communication channel
+
+─────────────────────────
+
+MAINTENANCE TASKS
+──────────────────
+
+DAILY:
+  ✓ Check error logs
+  ✓ Monitor API response times
+  ✓ Verify file upload success rate
+  ✓ Check database connection
+
+WEEKLY:
+  ✓ Review security logs
+  ✓ Backup database (auto in Atlas)
+  ✓ Review user feedback
+  ✓ Check for failed requests
+  ✓ Monitor server resources
+
+MONTHLY:
+  ✓ Update dependencies (security patches)
+  ✓ Performance analysis
+  ✓ Capacity planning
+  ✓ Review and clean old files
+  ✓ Analyze user metrics
+  ✓ Plan for upcoming features
+
+QUARTERLY:
+  ✓ Security audit
+  ✓ Code review
+  ✓ Database optimization
+  ✓ Infrastructure review
+  ✓ Budget analysis
+
+─────────────────────────
+
+TROUBLESHOOTING COMMON ISSUES
+───────────────────────────────
+
+Issue: Server not connecting to database
+Fix: 
+  1. Check MongoDB is running
+  2. Verify connection string in .env
+  3. Check database credentials
+  4. Verify network access (if cloud DB)
+
+Issue: File upload failing
+Fix:
+  1. Check /uploads directory exists
+  2. Verify file permissions
+  3. Check file size limit
+  4. Verify file type supported
+
+Issue: WhatsApp not opening
+Fix:
+  1. Check phone number format (+92 format)
+  2. Verify country code correct
+  3. Check phone number in .env
+  4. Verify customer phone input valid
+
+Issue: Slow page load times
+Fix:
+  1. Check database query performance
+  2. Optimize images
+  3. Enable caching
+  4. Review API response times
+  5. Scale up server resources
+
+Issue: High error rate
+Fix:
+  1. Check logs for error details
+  2. Verify environment variables
+  3. Check database connectivity
+  4. Review recent code changes
+  5. Clear cache if needed
+
+================================================================================
+                        SYSTEM ARCHITECTURE SUMMARY
+================================================================================
+
+ARCHITECTURE LAYERS:
+
+1. PRESENTATION LAYER (Frontend)
+   - React components
+   - User interface
+   - Page layouts
+   - Form handling
+   - Client-side validation
+
+2. APPLICATION LAYER (Business Logic)
+   - State management
+   - API communication
+   - User authentication
+   - Cart management
+   - Order creation
+
+3. API LAYER (Backend)
+   - Express.js routes
+   - Request handling
+   - Authentication middleware
+   - File upload processing
+   - Response formatting
+
+4. BUSINESS LOGIC LAYER
+   - Vendor management
+   - Product operations
+   - Order processing
+   - User authentication
+   - File handling
+
+5. DATA ACCESS LAYER
+   - Mongoose models
+   - Database queries
+   - Data validation
+   - Schema enforcement
+
+6. DATABASE LAYER
+   - MongoDB collections
+   - Data persistence
+   - Indexing
+   - Backups
+
+─────────────────────────
+
+DATA FLOW EXAMPLE:
+
+Customer Places Order:
+  1. Frontend collects order data
+  2. Validates on client
+  3. Sends to backend API
+  4. Backend validates again
+  5. Backend queries vendor details
+  6. Backend queries delivery boy info
+  7. Backend creates order record
+  8. Backend returns order confirmation
+  9. Frontend displays confirmation
+  10. Frontend opens WhatsApp link
+
+─────────────────────────
+
+KEY TECHNOLOGIES:
+
+Frontend:
+  - React: UI framework
+  - Bootstrap: CSS framework
+  - Axios: HTTP client
+  - React Router: URL routing
+
+Backend:
+  - Node.js: Runtime
+  - Express: Web framework
+  - Mongoose: MongoDB ORM
+  - JWT: Authentication
+  - Bcrypt: Password hashing
+  - Multer: File uploads
+
+Database:
+  - MongoDB: NoSQL database
+  - Collections: vendors, products, orders, etc.
+  - Indexes: For query optimization
+
+Deployment:
+  - Frontend: Vercel/Netlify
+  - Backend: Heroku/AWS/DigitalOcean
+  - Database: MongoDB Atlas
+  - CDN: CloudFront (optional)
+
+================================================================================
+                              CONCLUSION
+================================================================================
+
+The RocketWheel system provides a complete, production-ready platform for:
+
+✓ Multi-vendor restaurant management
+✓ Customer ordering via QR codes
+✓ WhatsApp-based delivery integration
+✓ Professional UI with blue/white theme
+✓ Restaurant photo uploads
+✓ Secure authentication
+✓ Responsive design
+✓ Complete documentation
+
+STATUS: PRODUCTION READY ✅
+RECOMMENDATION: Deploy to production
+
+All features implemented, tested, and documented.
+
+================================================================================

@@ -1,0 +1,83 @@
+# WhatsApp Order Logic - Quick Reference
+
+## 🎯 Core Rule
+**WhatsApp orders go ONLY to RocketWheel Delivery, NEVER to vendor**
+
+---
+
+## 📲 Order Flow (Corrected)
+
+```
+Customer
+  ↓ Add to cart
+  ↓ Enter delivery details
+  ↓ Click "Order via RocketWheel Delivery"
+  ↓
+WhatsApp Opens
+  ├─ To: Delivery Boy Phone (if assigned)
+  ├─ Or: Central RocketWheel Number (if no delivery boy)
+  └─ ❌ NEVER to: Vendor Phone
+  ↓
+Delivery Boy Receives Message
+  ↓ Goes to restaurant
+  ↓ Places VERBAL order
+  ↓ Picks up food
+  ↓ Delivers to customer
+  ↓
+Order Complete
+```
+
+---
+
+## ✅ Changes Made
+
+### 1. Frontend: Phone Number Logic
+```javascript
+// ❌ OLD: Included vendor phone
+vendor?.assignedDeliveryPhone || vendor?.phone || central
+
+// ✅ NEW: Only delivery or central
+vendor?.assignedDeliveryPhone || central
+```
+
+### 2. Button Text
+```
+❌ OLD: "Order Now via WhatsApp"
+✅ NEW: "Order via RocketWheel Delivery"
+```
+
+### 3. Message Format
+```
+✅ NEW: "Hello RocketWheel, New Delivery Order..."
+✅ Includes: "Restaurant is not notified. Please handle pickup and delivery."
+```
+
+---
+
+## 🔄 Phone Routing
+
+| Scenario | Phone Used | Recipient |
+|----------|-----------|-----------|
+| Vendor has delivery boy | Delivery Boy Phone | Delivery Boy |
+| No delivery boy assigned | Central RocketWheel | RocketWheel Team |
+| ❌ Vendor phone | NOT USED | NOT SENT |
+
+---
+
+## 📋 Database
+
+Vendor model:
+- ✅ `assignedDeliveryPhone` - Used for WhatsApp
+- ✅ `phone` - For vendor contact only (not for customer orders)
+
+---
+
+## ✨ Result
+
+✅ WhatsApp goes to RocketWheel Delivery  
+✅ Vendor not contacted via system  
+✅ Delivery boy handles pickup and delivery  
+✅ Restaurant receives verbal orders only  
+
+---
+
