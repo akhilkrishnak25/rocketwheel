@@ -14,7 +14,7 @@ const Setting = require('../models/Setting');
 const { verifyToken, adminAuth } = require('../middleware/auth');
 
 function getClientOrigin() {
-  return (process.env.CLIENT_ORIGIN || 'http://localhost:3000').replace(/\/+$/, '');
+  return (process.env.CLIENT_ORIGIN || 'https://akhilkrishnak25.github.io/rocketwheel/').replace(/\/+$/, '');
 }
 
 function usesHashRouter() {
