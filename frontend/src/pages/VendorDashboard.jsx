@@ -106,9 +106,19 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
 
   async function downloadQR() {
     try {
-      const res = await axios.get(`${API}/api/public/qr/vendor-direct/${vendorId}?t=${Date.now()}`);
+      let qrDataUrl = '';
+
+      try {
+        const res = await axios.get(`${API}/api/public/qr/vendor-direct/${vendorId}?t=${Date.now()}`);
+        qrDataUrl = res?.data?.dataUrl || '';
+      } catch (primaryErr) {
+        // Fallback: generate QR image via public API if backend route is not deployed yet.
+        const clientMenuUrl = `${window.location.origin}${window.location.pathname}#/menu/${vendorId}`;
+        qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=${encodeURIComponent(clientMenuUrl)}`;
+      }
+
       const link = document.createElement('a');
-      link.href = res.data.dataUrl;
+      link.href = qrDataUrl;
       link.download = `vendor-qr-${vendorId}.png`;
       link.click();
     } catch (err) {
