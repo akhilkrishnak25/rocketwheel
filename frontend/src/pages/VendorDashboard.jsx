@@ -106,7 +106,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
 
   async function downloadQR() {
     try {
-      const res = await axios.get(`${API}/api/public/qr/vendor/${vendorId}`);
+      const res = await axios.get(`${API}/api/public/qr/vendor-direct/${vendorId}?t=${Date.now()}`);
       const link = document.createElement('a');
       link.href = res.data.dataUrl;
       link.download = `vendor-qr-${vendorId}.png`;

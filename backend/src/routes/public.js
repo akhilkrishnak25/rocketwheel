@@ -78,6 +78,18 @@ router.get('/qr/global', async (req, res) => {
   }
 });
 
+// Vendor QR without DB lookup (useful when DB has transient issues)
+router.get('/qr/vendor-direct/:vendorId', async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+    const url = buildVendorMenuUrl(vendorId);
+    const dataUrl = await generateQrDataUrl(url);
+    res.json({ dataUrl, url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Vendor QR
 router.get('/qr/vendor/:vendorId', async (req, res) => {
   try {
