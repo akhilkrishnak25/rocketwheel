@@ -17,6 +17,8 @@ services:
         sync: false
       - key: CLIENT_ORIGIN
         sync: false
+      - key: CLIENT_ROUTER_MODE
+        value: hash
 
   - type: static
     name: rocketwheel-frontend

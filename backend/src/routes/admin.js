@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const Vendor = require('../models/Vendor');
 const Product = require('../models/Product');
@@ -20,6 +21,12 @@ const {
 // Admin login
 router.post('/login', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        error: 'Database unavailable. Please allow this machine IP in MongoDB Atlas Network Access and try again.'
+      });
+    }
+
     const { email, password } = req.body;
     let admin = await Admin.findOne({ email });
     if (!admin) {
