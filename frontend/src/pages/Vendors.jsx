@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API from '../config/api';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 const GOOGLE_PLAY_BADGE_SRC = 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
 
 export default function Vendors() {

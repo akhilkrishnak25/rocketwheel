@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+import API from '../config/api';
 
 function resolveImageSrc(imageUrl) {
   if (!imageUrl) return '';
