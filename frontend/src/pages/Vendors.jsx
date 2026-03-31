@@ -141,9 +141,7 @@ export default function Vendors() {
         background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 50%, #0C2162 100%)',
         color: 'white',
         padding: 'clamp(1rem, 4vw, 4rem) 0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
+        position: 'relative',
         overflow: 'hidden',
         boxShadow: '0 12px 24px rgba(0,0,0,0.1)',
         backdropFilter: 'blur(10px)'
