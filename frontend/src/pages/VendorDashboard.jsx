@@ -23,6 +23,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
   const [editProduct, setEditProduct] = useState({ name: '', price: '', category: '', imageUrl: '' });
   const [vendorPhoto, setVendorPhoto] = useState(null);
   const [excelFile, setExcelFile] = useState(null);
+  const [bulkImageFiles, setBulkImageFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
     }
     const formData = new FormData();
     formData.append('file', excelFile);
+    bulkImageFiles.forEach((img) => formData.append('images', img));
     try {
       const res = await axios.post(`${API}/api/vendor/${vendorId}/products/upload-xlsx`, formData, { ...config, headers: { ...config.headers, 'Content-Type': 'multipart/form-data' } });
       const createdCount = res?.data?.createdCount ?? 0;
@@ -95,6 +97,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
       setSuccess(`Products uploaded! Added ${createdCount} item(s).${skippedCount ? ` Skipped ${skippedCount} invalid row(s).` : ''}`);
       setError('');
       setExcelFile(null);
+      setBulkImageFiles([]);
       loadProducts();
     } catch (err) {
       const message = err?.response?.data?.error || err?.message || 'Failed to upload file';
@@ -250,12 +253,12 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
   function downloadTemplate() {
     try {
       // Create template with sample data
-      const headers = ['Name', 'Price', 'Category', 'ImageUrl'];
+      const headers = ['Name', 'Price', 'Category', 'ImageUrl', 'ImageFile'];
       const sampleRows = [
-        ['"Biryani"', '250', '"Biryani"', '"/uploads/products/biryani.jpg"'],
-        ['"Dosa"', '120', '"Dosa"', '"https://example.com/dosa.jpg"'],
-        ['"Samosa"', '50', '"Snacks"', '""'],
-        ['"Chai"', '20', '"Beverages"', '""']
+        ['"Biryani"', '250', '"Biryani"', '"/uploads/products/biryani.jpg"', '""'],
+        ['"Dosa"', '120', '"Dosa"', '"https://example.com/dosa.jpg"', '""'],
+        ['"Samosa"', '50', '"Snacks"', '""', '"samosa.jpg"'],
+        ['"Chai"', '20', '"Beverages"', '""', '"chai.png"']
       ];
 
       const csvContent = [
@@ -746,10 +749,13 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
             marginBottom: '2rem'
           }}>
             <p style={{ color: '#64748B', marginBottom: '1rem', fontSize: '0.95rem' }}>
-              📋 Excel format: Required columns: <strong>Name</strong>, <strong>Price</strong>. Optional columns: <strong>Category</strong>, <strong>Image/ImageUrl</strong> (full URL or /uploads path).
+              📋 Excel format: Required columns: <strong>Name</strong>, <strong>Price</strong>. Optional columns: <strong>Category</strong>, <strong>Image/ImageUrl</strong> (full URL or /uploads path), <strong>ImageFile</strong> (for local image uploads).
             </p>
             <p style={{ color: '#94A3B8', marginBottom: '1rem', fontSize: '0.85rem' }}>
-              Example header row: Name | Price | Category | ImageUrl
+              Example header row: Name | Price | Category | ImageUrl | ImageFile
+            </p>
+            <p style={{ color: '#64748B', marginBottom: '1rem', fontSize: '0.85rem' }}>
+              If using local files, upload images below and set <strong>ImageFile</strong> in sheet to exact file name (example: <strong>samosa.jpg</strong>).
             </p>
             <div style={{ marginBottom: '1.5rem' }}>
               <button
@@ -786,6 +792,14 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
                   accept=".xlsx,.xls,.csv"
                   onChange={e => setExcelFile(e.target.files[0])}
                   required
+                  style={{ borderRadius: '8px', border: '1px solid #CBD5E1', padding: '0.6rem' }}
+                />
+                <input
+                  className="form-control"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={e => setBulkImageFiles(Array.from(e.target.files || []))}
                   style={{ borderRadius: '8px', border: '1px solid #CBD5E1', padding: '0.6rem' }}
                 />
                 <button

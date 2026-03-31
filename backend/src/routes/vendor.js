@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs/promises');
 const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -13,14 +14,36 @@ const { verifyToken, vendorAuth } = require('../middleware/auth');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const bulkUpload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const isExcelOrCsv = /\.(xlsx|xls|csv)$/i.test(file.originalname || '');
-    if (!isExcelOrCsv) {
-      return cb(new Error('Invalid file type. Upload .xlsx, .xls, or .csv file.'));
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      return cb(null, path.join(__dirname, '..', '..', 'uploads', 'products'));
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname || '').toLowerCase();
+      const safeExt = ext || (file.mimetype && file.mimetype.startsWith('image/') ? '.jpg' : '');
+      const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
+      cb(null, uniqueName);
     }
-    cb(null, true);
+  }),
+  limits: { fileSize: 8 * 1024 * 1024, files: 51 },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'file') {
+      const isExcelOrCsv = /\.(xlsx|xls|csv)$/i.test(file.originalname || '');
+      if (!isExcelOrCsv) {
+        return cb(new Error('Invalid sheet file type. Upload .xlsx, .xls, or .csv file.'));
+      }
+      return cb(null, true);
+    }
+
+    if (file.fieldname === 'images') {
+      const isImage = (file.mimetype || '').startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(file.originalname || '');
+      if (!isImage) {
+        return cb(new Error('Invalid image file type in images field.'));
+      }
+      return cb(null, true);
+    }
+
+    return cb(new Error('Unexpected file field. Use file and optional images fields.'));
   }
 });
 
@@ -124,19 +147,34 @@ router.delete('/:vendorId/products/:productId', verifyToken, vendorAuth, async (
 
 // Bulk upload via Excel
 router.post('/:vendorId/products/upload-xlsx', verifyToken, vendorAuth, (req, res, next) => {
-  bulkUpload.single('file')(req, res, (err) => {
+  bulkUpload.fields([
+    { name: 'file', maxCount: 1 },
+    { name: 'images', maxCount: 50 }
+  ])(req, res, (err) => {
     if (!err) return next();
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
+      return res.status(400).json({ error: 'File too large. Maximum size is 8MB per file.' });
     }
     return res.status(400).json({ error: err.message || 'File upload failed' });
   });
 }, async (req, res) => {
+  const cleanupFiles = async (files = []) => {
+    await Promise.all(files.map(async (file) => {
+      try {
+        await fs.unlink(file.path);
+      } catch (e) {
+        // Ignore cleanup errors for missing files.
+      }
+    }));
+  };
+
   try {
     if (req.user.id !== req.params.vendorId) return res.status(403).json({ error: 'Unauthorized' });
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const sheetFile = req.files?.file?.[0];
+    const imageFiles = req.files?.images || [];
+    if (!sheetFile) return res.status(400).json({ error: 'No sheet file uploaded' });
 
-    const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+    const workbook = xlsx.readFile(sheetFile.path, { type: 'file' });
     if (!workbook.SheetNames.length) {
       return res.status(400).json({ error: 'No worksheet found in uploaded file' });
     }
@@ -155,6 +193,14 @@ router.post('/:vendorId/products/upload-xlsx', verifyToken, vendorAuth, (req, re
 
     const validProducts = [];
     const skippedRows = [];
+    const imageMap = new Map();
+    const usedImagePaths = new Set();
+
+    imageFiles.forEach((img) => {
+      const key = (img.originalname || '').trim().toLowerCase();
+      if (!key) return;
+      imageMap.set(key, `/uploads/products/${img.filename}`);
+    });
 
     rows.forEach((row, index) => {
       const rowNumber = index + 2;
@@ -165,7 +211,21 @@ router.post('/:vendorId/products/upload-xlsx', verifyToken, vendorAuth, (req, re
         : String(rawPrice).replace(/[^0-9.-]/g, '');
       const price = Number(normalizedPrice);
       const imageUrlRaw = row.imageUrl ?? row.ImageUrl ?? row.imageURL ?? row.ImageURL ?? row.image ?? row.Image;
-      const imageUrl = imageUrlRaw ? String(imageUrlRaw).trim() : undefined;
+      const directImageValue = imageUrlRaw ? String(imageUrlRaw).trim() : '';
+      const imageFileRaw = row.imageFile ?? row.ImageFile ?? row.imageName ?? row.ImageName ?? row.fileName ?? row.FileName ?? row.localImage ?? row.LocalImage;
+      const imageFileName = imageFileRaw ? String(imageFileRaw).trim().toLowerCase() : '';
+
+      let imageUrl = directImageValue || undefined;
+      if (imageFileName && imageMap.has(imageFileName)) {
+        imageUrl = imageMap.get(imageFileName);
+        usedImagePaths.add(imageUrl);
+      } else if (!directImageValue && imageFileName) {
+        skippedRows.push({ row: rowNumber, reason: `Image file not found for ${imageFileName}` });
+      } else if (directImageValue && imageMap.has(directImageValue.toLowerCase())) {
+        imageUrl = imageMap.get(directImageValue.toLowerCase());
+        usedImagePaths.add(imageUrl);
+      }
+
       const categoryRaw = row.category ?? row.Category ?? row.cat ?? row.Cat;
       const category = categoryRaw ? String(categoryRaw).trim() : undefined;
 
@@ -198,6 +258,10 @@ router.post('/:vendorId/products/upload-xlsx', verifyToken, vendorAuth, (req, re
       $push: { products: { $each: createdProducts.map((p) => p._id) } }
     });
 
+    const unusedImages = imageFiles.filter((img) => !usedImagePaths.has(`/uploads/products/${img.filename}`));
+    await cleanupFiles(unusedImages);
+    await cleanupFiles([sheetFile]);
+
     res.json({
       success: true,
       createdCount: createdProducts.length,
@@ -206,6 +270,8 @@ router.post('/:vendorId/products/upload-xlsx', verifyToken, vendorAuth, (req, re
       products: createdProducts
     });
   } catch (err) {
+    await cleanupFiles(req.files?.file || []);
+    await cleanupFiles(req.files?.images || []);
     res.status(500).json({ error: err.message });
   }
 });

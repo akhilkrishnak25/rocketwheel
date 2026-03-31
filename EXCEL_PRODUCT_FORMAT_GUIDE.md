@@ -11,6 +11,7 @@ This guide explains how to prepare an Excel file for bulk uploading products wit
 | **Price** | Number | ✅ Yes | Product price in ₹ |
 | **Category** | Text | ❌ No | Product category (e.g., Biryani, Dosa, etc.) |
 | **ImageUrl** | Text | ❌ No | Full image URL or /uploads/products/filename.jpg |
+| **ImageFile** | Text | ❌ No | Local image filename uploaded with the sheet (e.g., samosa.jpg) |
 
 ## Column Name Variations
 
@@ -19,20 +20,21 @@ The system recognizes variations of column names:
 - **Price**: `price`, `Price`, `amount`, `Amount`, `cost`, `Cost`
 - **Category**: `category`, `Category`, `cat`, `Cat`
 - **Image**: `imageUrl`, `ImageUrl`, `imageURL`, `ImageURL`, `image`, `Image`
+- **ImageFile**: `imageFile`, `ImageFile`, `imageName`, `ImageName`, `fileName`, `FileName`, `localImage`, `LocalImage`
 
 ## Excel File Format
 
 ### Example Header Row
 ```
-Name | Price | Category | ImageUrl
+Name | Price | Category | ImageUrl | ImageFile
 ```
 
 ### Example Data Rows
 ```
-Biryani | 250 | Biryani | https://example.com/biryani.jpg
-Dosa | 120 | Dosa | /uploads/products/dosa.jpg
-Samosa | 50 | Snacks | 
-Chai | 20 | Beverages | https://example.com/chai.jpg
+Biryani | 250 | Biryani | https://example.com/biryani.jpg | 
+Dosa | 120 | Dosa | /uploads/products/dosa.jpg | 
+Samosa | 50 | Snacks |  | samosa.jpg
+Chai | 20 | Beverages |  | chai.png
 ```
 
 ## Important Notes
@@ -51,9 +53,14 @@ Chai | 20 | Beverages | https://example.com/chai.jpg
    - Can be local path (e.g., /uploads/products/image.jpg)
    - Optional field - product works without image
 
-4. **File Format**:
+4. **Local Image Files (Optional)**:
+   - Upload local images in the same bulk upload form
+   - Set `ImageFile` column value to exact filename
+   - Example: `ImageFile = samosa.jpg` and upload file named `samosa.jpg`
+
+5. **File Format**:
    - Supported formats: `.xlsx`, `.xls`, `.csv`
-   - Maximum file size: 5MB
+   - Maximum file size: 8MB per uploaded file
    - Only first sheet is processed
 
 ## Upload Process
