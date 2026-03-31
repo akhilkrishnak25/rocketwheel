@@ -284,20 +284,10 @@ export default function AdminDashboard({ token, onLogout }) {
   }
 
   return (
-    <div style={{ backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '2rem 0' }}>
+    <div className="dashboard-shell">
       <div className="container-fluid">
         {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1E40AF 0%, #1A3A8A 50%, #3B82F6 100%)',
-          color: 'white',
-          padding: '2rem',
-          borderRadius: '12px',
-          marginBottom: '2rem',
-          boxShadow: '0 12px 24px rgba(30, 64, 175, 0.12)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="dashboard-header">
           <h2 style={{ margin: 0, fontWeight: '700', fontSize: '1.8rem' }}>🛠️ Admin Dashboard</h2>
           <button
             className="btn btn-danger"
@@ -351,35 +341,12 @@ export default function AdminDashboard({ token, onLogout }) {
         )}
 
         {/* Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          marginBottom: '2rem',
-          borderBottom: '2px solid #E2E8F0',
-          overflowX: 'auto'
-        }}>
+        <div className="dashboard-tabs">
           {['vendors', 'delivery', 'banner', 'central'].map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              style={{
-                padding: '1rem 1.5rem',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                color: tab === t ? '#1E40AF' : '#64748B',
-                borderBottom: tab === t ? '3px solid #1E40AF' : 'none',
-                transition: 'all 0.3s ease',
-                textTransform: 'capitalize'
-              }}
-              onMouseEnter={(e) => {
-                if (tab !== t) e.target.style.color = '#1E40AF';
-              }}
-              onMouseLeave={(e) => {
-                if (tab !== t) e.target.style.color = '#64748B';
-              }}
+              className={`dashboard-tab ${tab === t ? 'active' : ''}`}
             >
               {t === 'vendors' && '🏪 Vendors'}
               {t === 'delivery' && '🛵 Delivery Boys'}
@@ -392,16 +359,8 @@ export default function AdminDashboard({ token, onLogout }) {
       {tab === 'vendors' && (
         <div>
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>📋 Pending Vendors</h4>
-          <div style={{
-            overflowX: 'auto',
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)'
-          }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse'
-            }}>
+          <div className="data-table-wrap">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #E2E8F0', background: '#EFF6FF' }}>
                   <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#1E40AF' }}>Name</th>
@@ -544,14 +503,8 @@ export default function AdminDashboard({ token, onLogout }) {
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>🛵 Delivery Boys</h4>
           
           {/* Add Delivery Boy Form */}
-          <form onSubmit={addDeliveryBoy} className="mb-3" style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            marginBottom: '2rem'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+          <form onSubmit={addDeliveryBoy} className="panel mb-3">
+            <div className="form-grid" style={{ marginBottom: '1rem' }}>
               <input
                 className="form-control"
                 placeholder="Name"
@@ -796,13 +749,8 @@ export default function AdminDashboard({ token, onLogout }) {
           )}
 
           {/* Delivery Boys Table */}
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            overflowX: 'auto'
-          }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="data-table-wrap">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #E2E8F0', background: '#EFF6FF' }}>
                   <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#1E40AF' }}>Name</th>
@@ -897,13 +845,8 @@ export default function AdminDashboard({ token, onLogout }) {
       {tab === 'banner' && (
         <div>
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>🖼️ Manage Banners</h4>
-          <form onSubmit={uploadBanner} style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+          <form onSubmit={uploadBanner} className="panel">
+            <div className="form-grid" style={{ marginBottom: '1rem' }}>
               <input
                 className="form-control"
                 placeholder="Banner Title"
@@ -1094,13 +1037,8 @@ export default function AdminDashboard({ token, onLogout }) {
           }}>
             Current customer support number: {centralPhone || 'Not set'}
           </div>
-          <form onSubmit={setCentral} style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+          <form onSubmit={setCentral} className="panel">
+            <div className="form-grid" style={{ marginBottom: '1rem' }}>
               <input
                 className="form-control"
                 placeholder="WhatsApp Phone (e.g., 919XXXXXXXXX)"

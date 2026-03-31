@@ -332,20 +332,10 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
     .filter((p) => selectedProductCategory === '' || (p.category || '').trim() === selectedProductCategory);
 
   return (
-    <div style={{ backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '2rem 0' }}>
+    <div className="dashboard-shell">
       <div className="container-fluid">
         {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1E40AF 0%, #1A3A8A 50%, #3B82F6 100%)',
-          color: 'white',
-          padding: '2rem',
-          borderRadius: '12px',
-          marginBottom: '2rem',
-          boxShadow: '0 12px 24px rgba(30, 64, 175, 0.12)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="dashboard-header">
           <div>
             <h2 style={{ margin: 0, fontWeight: '700', fontSize: '1.8rem' }}>📍 {vendor.name}</h2>
             <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontSize: '0.95rem' }}>
@@ -404,35 +394,12 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
         )}
 
         {/* Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          marginBottom: '2rem',
-          borderBottom: '2px solid #E2E8F0',
-          overflowX: 'auto'
-        }}>
+        <div className="dashboard-tabs">
           {['products', 'bulk', 'qr', 'settings'].map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              style={{
-                padding: '1rem 1.5rem',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                color: tab === t ? '#1E40AF' : '#64748B',
-                borderBottom: tab === t ? '3px solid #1E40AF' : 'none',
-                transition: 'all 0.3s ease',
-                textTransform: 'capitalize'
-              }}
-              onMouseEnter={(e) => {
-                if (tab !== t) e.target.style.color = '#1E40AF';
-              }}
-              onMouseLeave={(e) => {
-                if (tab !== t) e.target.style.color = '#64748B';
-              }}
+              className={`dashboard-tab ${tab === t ? 'active' : ''}`}
             >
               {t === 'products' && '📦 Products'}
               {t === 'bulk' && '📤 Bulk Upload'}
@@ -445,14 +412,8 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
       {tab === 'products' && (
         <div>
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>📦 Add Product</h4>
-          <form onSubmit={addProduct} style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            marginBottom: '2rem'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+          <form onSubmit={addProduct} className="panel">
+            <div className="form-grid" style={{ marginBottom: '1rem' }}>
               <input
                 className="form-control"
                 placeholder="Product Name"
@@ -511,16 +472,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
 
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>Your Products</h4>
 
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            padding: '1rem',
-            marginBottom: '1rem',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '0.75rem'
-          }}>
+          <div className="panel form-grid" style={{ marginBottom: '1rem', padding: '1rem' }}>
             <input
               className="form-control"
               placeholder="Search product name..."
@@ -573,13 +525,8 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
             </div>
           )}
           
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            overflowX: 'auto'
-          }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="data-table-wrap">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #E2E8F0', background: '#EFF6FF' }}>
                   <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: '#1E40AF' }}>Name</th>
@@ -741,13 +688,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
       {tab === 'bulk' && (
         <div>
           <h4 style={{ color: '#1E40AF', fontWeight: '700', marginBottom: '1.5rem' }}>📤 Bulk Upload via Excel</h4>
-          <div style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(30, 64, 175, 0.1)',
-            marginBottom: '2rem'
-          }}>
+          <div className="panel">
             <p style={{ color: '#64748B', marginBottom: '1rem', fontSize: '0.95rem' }}>
               📋 Excel format: Required columns: <strong>Name</strong>, <strong>Price</strong>. Optional columns: <strong>Category</strong>, <strong>Image/ImageUrl</strong> (full URL or /uploads path), <strong>ImageFile</strong> (for local image uploads).
             </p>
@@ -785,7 +726,7 @@ export default function VendorDashboard({ token, vendorId, onLogout }) {
               </button>
             </div>
             <form onSubmit={uploadExcel}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div className="form-grid">
                 <input
                   className="form-control"
                   type="file"

@@ -132,7 +132,7 @@ export default function Vendors() {
   }
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div className="vendors-page">
       {/* Premium Header Section */}
       <div style={{
         background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #1A3A8A 100%)',
@@ -525,7 +525,7 @@ export default function Vendors() {
       )}
 
       {/* Main Content */}
-      <div className="container" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
+      <div className="container vendors-content" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
         {loadError ? (
           <div style={{
             background: 'linear-gradient(135deg, #FEF2F2 0%, #FFF1F2 100%)',
@@ -575,14 +575,7 @@ export default function Vendors() {
           Object.keys(filteredVendors).map(cat => (
             <div key={cat} style={{ marginBottom: '4rem' }}>
               {/* Category Header */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                marginBottom: '2.5rem',
-                paddingBottom: '1rem',
-                borderBottom: '3px solid #1E40AF'
-              }}>
+              <div className="vendors-category">
                 <div style={{
                   width: '50px',
                   height: '50px',
@@ -612,11 +605,8 @@ export default function Vendors() {
                     animation: 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}>
                     <div
-                      className="card"
+                      className="vendors-card"
                       style={{
-                        height: '100%',
-                        cursor: 'pointer',
-                        background: 'white',
                         position: 'relative',
                         borderTop: '4px solid #1E40AF'
                       }}
@@ -668,7 +658,7 @@ export default function Vendors() {
                         )}
                       </div>
 
-                      <div className="card-body" style={{ position: 'relative' }}>
+                      <div className="vendors-card-body" style={{ position: 'relative' }}>
                         <h5 style={{
                           color: '#212529',
                           fontWeight: '700',
@@ -721,6 +711,7 @@ export default function Vendors() {
                         )}
 
                         <button
+                          className="vendors-card-cta"
                           onClick={() => navigate(`/menu/${v._id}`)}
                           style={{
                             width: '100%',

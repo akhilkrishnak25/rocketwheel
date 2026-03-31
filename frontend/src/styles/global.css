@@ -969,4 +969,382 @@ input, textarea, select {
   background: var(--primary-dark);
 }
 
+/* ============================================
+   PRODUCTION UI LAYER (SCOPED)
+   ============================================ */
+
+.modern-app {
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --surface-1: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #eff6ff;
+  --border-soft: #dbe5f1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --shadow-hover: 0 14px 34px rgba(30, 64, 175, 0.14);
+}
+
+.modern-app,
+.modern-app * {
+  scroll-margin-top: 80px;
+}
+
+.modern-app .container {
+  max-width: 1200px;
+}
+
+.modern-app .container-fluid {
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.modern-app .dashboard-shell {
+  background: #f8fafc;
+  min-height: 100vh;
+  padding: 32px 0;
+}
+
+.modern-app .dashboard-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1a3a8a 50%, #3b82f6 100%);
+  color: #fff;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-hover);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.modern-app .dashboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #dbe5f1;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.modern-app .dashboard-tab {
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  border-radius: 10px 10px 0 0;
+  box-shadow: none !important;
+}
+
+.modern-app .dashboard-tab.active {
+  color: #1e40af;
+  border-bottom-color: #1e40af;
+  background: #eff6ff;
+}
+
+.modern-app .panel {
+  background: #fff;
+  border: 1px solid #dbe5f1;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.modern-app .panel-title {
+  color: #1e40af;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.modern-app .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.modern-app .data-table-wrap {
+  background: #fff;
+  border: 1px solid #dbe5f1;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  overflow: auto;
+}
+
+.modern-app .data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-app .data-table th {
+  background: #eff6ff;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.modern-app .data-table td,
+.modern-app .data-table th {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modern-app .vendors-page {
+  min-height: 100vh;
+}
+
+.modern-app .vendors-content {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.modern-app .vendors-category {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #1e40af;
+}
+
+.modern-app .vendors-card {
+  height: 100%;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #dbe5f1;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.modern-app .vendors-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+.modern-app .vendors-card-body {
+  padding: 16px;
+}
+
+.modern-app .vendors-card-cta {
+  width: 100%;
+}
+
+.modern-app h1,
+.modern-app h2,
+.modern-app h3,
+.modern-app h4,
+.modern-app h5,
+.modern-app h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.modern-app p,
+.modern-app label,
+.modern-app small,
+.modern-app td,
+.modern-app th,
+.modern-app input,
+.modern-app select,
+.modern-app textarea,
+.modern-app button {
+  font-family: var(--font-family);
+}
+
+/* Buttons */
+.modern-app button,
+.modern-app .btn {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid transparent !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease, border-color 0.22s ease !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.modern-app button:hover,
+.modern-app .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.modern-app button:active,
+.modern-app .btn:active {
+  transform: translateY(0);
+}
+
+/* Cards and surface blocks */
+.modern-app .card,
+.modern-app [style*="box-shadow"] {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border: 1px solid var(--border-soft) !important;
+}
+
+.modern-app .card:hover {
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* Forms */
+.modern-app input,
+.modern-app select,
+.modern-app textarea,
+.modern-app .form-control {
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--border-soft) !important;
+  background: #fff !important;
+  color: var(--text-primary) !important;
+  padding: 10px 12px !important;
+  min-height: 44px;
+}
+
+.modern-app input:focus,
+.modern-app select:focus,
+.modern-app textarea:focus,
+.modern-app .form-control:focus {
+  outline: none !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16) !important;
+}
+
+/* Tables and lists */
+.modern-app table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.modern-app thead tr {
+  background: linear-gradient(180deg, #eff6ff 0%, #e2e8f0 100%) !important;
+}
+
+.modern-app th,
+.modern-app td {
+  padding: 14px 16px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.modern-app tbody tr:nth-child(even) {
+  background: #f8fafc !important;
+}
+
+.modern-app tbody tr:hover {
+  background: #eff6ff !important;
+}
+
+/* Header/hero stabilization for visual hierarchy */
+.modern-app [style*="position: sticky"] {
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Motion */
+.modern-app .card,
+.modern-app button,
+.modern-app .btn,
+.modern-app input,
+.modern-app select,
+.modern-app textarea,
+.modern-app tbody tr {
+  transition: all 0.24s ease-in-out;
+}
+
+.modern-app .row > .col,
+.modern-app .row > div {
+  animation: enterUp 0.35s ease both;
+}
+
+@keyframes enterUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Better responsive spacing */
+@media (max-width: 900px) {
+  .modern-app .container,
+  .modern-app .container-fluid {
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+
+  .modern-app .row {
+    gap: var(--space-2);
+  }
+
+  .modern-app table,
+  .modern-app thead,
+  .modern-app tbody,
+  .modern-app tr,
+  .modern-app td,
+  .modern-app th {
+    font-size: 0.92rem;
+  }
+}
+
+/* Optional dark mode support */
+@media (prefers-color-scheme: dark) {
+  .modern-app {
+    --surface-1: #0f172a;
+    --surface-2: #111827;
+    --surface-3: #1f2937;
+    --border-soft: #334155;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+  }
+
+  .modern-app {
+    background: radial-gradient(circle at top, #0b2545 0%, #020617 55%) !important;
+  }
+
+  .modern-app .card,
+  .modern-app [style*="background: 'white'"],
+  .modern-app [style*="background:white"] {
+    background: #111827 !important;
+    color: var(--text-primary) !important;
+    border-color: #334155 !important;
+  }
+
+  .modern-app p,
+  .modern-app td,
+  .modern-app th,
+  .modern-app label {
+    color: var(--text-secondary) !important;
+  }
+
+  .modern-app input,
+  .modern-app select,
+  .modern-app textarea,
+  .modern-app .form-control {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+  }
+
+  .modern-app tbody tr:nth-child(even) {
+    background: #0b1220 !important;
+  }
+
+  .modern-app tbody tr:hover {
+    background: #17243a !important;
+  }
+}
+
 

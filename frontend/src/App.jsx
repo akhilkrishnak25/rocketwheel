@@ -39,7 +39,7 @@ function AppRoutes() {
   };
 
   return (
-    <div key={location.pathname} className="page-fade-in">
+    <div key={location.pathname} className="page-fade-in modern-app">
       <Routes>
         <Route path="/vendors" element={<Vendors />} />
         <Route path="/menu/:vendorId" element={<VendorMenu />} />
