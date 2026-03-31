@@ -116,10 +116,10 @@ export default function VendorMenu() {
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* Header with Back Button */}
       <div style={{
-        background: 'linear-gradient(135deg, #1E40AF 0%, #1A3A8A 50%, #3B82F6 100%)',
+        background: 'linear-gradient(135deg, #112E87 0%, #0C2162 50%, #2A52BE 100%)',
         color: 'white',
         padding: '1.5rem 0',
-        boxShadow: '0 12px 24px rgba(30, 64, 175, 0.12)',
+        boxShadow: '0 12px 24px rgba(17, 46, 135, 0.12)',
         position: 'relative'
       }}>
         <div className="container d-flex flex-between align-items-center">
@@ -179,7 +179,7 @@ export default function VendorMenu() {
       <div className="container p-3" style={{ backgroundColor: 'white', borderBottom: '2px solid #E0E7FF' }}>
         <p style={{ marginBottom: '0.5rem' }}>
           <span style={{
-            background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+            background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 100%)',
             color: 'white',
             padding: '0.4rem 0.8rem',
             borderRadius: '20px',
@@ -195,7 +195,7 @@ export default function VendorMenu() {
         <p style={{ color: '#64748B', fontSize: '0.95rem', marginBottom: 0 }}>
           📞 {data.vendor.phone}
         </p>
-        <p style={{ color: '#1E3A8A', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: 0, fontWeight: '600' }}>
+        <p style={{ color: '#B45309', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: 0, fontWeight: '600' }}>
           🛟 Customer Support: {supportPhone || 'Not available'}
         </p>
       </div>
@@ -204,7 +204,7 @@ export default function VendorMenu() {
         {/* Menu Section */}
         <div className="col">
             <div style={{ paddingBottom: cart.length > 0 ? '140px' : '0' }}>
-            <h4 style={{ color: '#1E40AF', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1.4rem' }}>
+            <h4 style={{ color: '#112E87', marginBottom: '1.5rem', fontWeight: '700', fontSize: '1.4rem' }}>
               📋 Our Menu
             </h4>
 
@@ -222,17 +222,17 @@ export default function VendorMenu() {
                   border: '1px solid #CBD5E1',
                   borderRadius: '10px',
                   backgroundColor: 'white',
-                  boxShadow: '0 4px 12px rgba(30, 64, 175, 0.08)',
+                  boxShadow: '0 4px 12px rgba(17, 46, 135, 0.08)',
                   transition: 'all 0.3s ease',
                   outline: 'none'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#3B82F6';
-                  e.target.style.boxShadow = '0 4px 12px rgba(30, 64, 175, 0.15)';
+                  e.target.style.borderColor = '#2A52BE';
+                  e.target.style.boxShadow = '0 4px 12px rgba(17, 46, 135, 0.15)';
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = '#CBD5E1';
-                  e.target.style.boxShadow = '0 4px 12px rgba(30, 64, 175, 0.08)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(17, 46, 135, 0.08)';
                 }}
               />
             </div>
@@ -240,7 +240,7 @@ export default function VendorMenu() {
             {/* Category Filter */}
             {data.products.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ marginBottom: '0.75rem', fontWeight: '600', color: '#1E40AF', fontSize: '0.9rem' }}>
+                <div style={{ marginBottom: '0.75rem', fontWeight: '600', color: '#112E87', fontSize: '0.9rem' }}>
                   Filter by Category
                 </div>
                 <select
@@ -253,7 +253,7 @@ export default function VendorMenu() {
                     border: '1px solid #CBD5E1',
                     borderRadius: '10px',
                     backgroundColor: 'white',
-                    boxShadow: '0 4px 12px rgba(30, 64, 175, 0.08)',
+                    boxShadow: '0 4px 12px rgba(17, 46, 135, 0.08)',
                     outline: 'none'
                   }}
                 >
@@ -272,10 +272,10 @@ export default function VendorMenu() {
 
             {data.products.length === 0 ? (
               <div className="card border-0 shadow-md p-5 text-center" style={{
-                backgroundColor: '#EFF6FF',
-                borderLeft: '4px solid #3B82F6'
+                backgroundColor: '#FFF3E8',
+                borderLeft: '4px solid #2A52BE'
               }}>
-                <h5 style={{ color: '#1E40AF' }}>No products available</h5>
+                <h5 style={{ color: '#112E87' }}>No products available</h5>
                 <p className="text-muted mt-2">Come back soon!</p>
               </div>
             ) : (
@@ -286,18 +286,18 @@ export default function VendorMenu() {
                   .map(p => (
                   <div key={p._id} className="card" style={{
                     borderRadius: '14px',
-                    boxShadow: '0 10px 22px rgba(30, 64, 175, 0.08)',
+                    boxShadow: '0 10px 22px rgba(17, 46, 135, 0.08)',
                     border: '1px solid #E2E8F0',
                     overflow: 'hidden',
                     transition: 'transform 0.25s ease, box-shadow 0.25s ease'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 16px 32px rgba(30, 64, 175, 0.12)';
+                    e.currentTarget.style.boxShadow = '0 16px 32px rgba(17, 46, 135, 0.12)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 10px 22px rgba(30, 64, 175, 0.08)';
+                    e.currentTarget.style.boxShadow = '0 10px 22px rgba(17, 46, 135, 0.08)';
                   }}>
                     <div className="vendor-menu-item-grid" style={{
                       display: 'grid',
@@ -310,7 +310,7 @@ export default function VendorMenu() {
                         height: '110px',
                         borderRadius: '10px',
                         overflow: 'hidden',
-                        background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)'
+                        background: 'linear-gradient(135deg, #FFF3E8 0%, #FFE0C4 100%)'
                       }}>
                         {p.imageUrl ? (
                           <img
@@ -332,7 +332,7 @@ export default function VendorMenu() {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.8rem' }}>
-                          <div style={{ fontSize: '1.08rem', fontWeight: '700', color: '#1E40AF' }}>₹{p.price}</div>
+                          <div style={{ fontSize: '1.08rem', fontWeight: '700', color: '#112E87' }}>₹{p.price}</div>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                             {getCartQty(p._id) > 0 ? (
@@ -343,16 +343,16 @@ export default function VendorMenu() {
                                     width: '28px',
                                     height: '28px',
                                     borderRadius: '8px',
-                                    border: '1px solid #BFDBFE',
+                                    border: '1px solid #FFD1A1',
                                     background: 'white',
-                                    color: '#1E40AF',
+                                    color: '#112E87',
                                     cursor: 'pointer',
                                     fontWeight: '700'
                                   }}
                                 >
                                   -
                                 </button>
-                                <span style={{ minWidth: '18px', textAlign: 'center', fontWeight: '700', color: '#1E40AF' }}>
+                                <span style={{ minWidth: '18px', textAlign: 'center', fontWeight: '700', color: '#112E87' }}>
                                   {getCartQty(p._id)}
                                 </span>
                                 <button
@@ -362,7 +362,7 @@ export default function VendorMenu() {
                                     height: '28px',
                                     borderRadius: '8px',
                                     border: 'none',
-                                    background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                                    background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 100%)',
                                     color: 'white',
                                     cursor: 'pointer',
                                     fontWeight: '700'
@@ -379,7 +379,7 @@ export default function VendorMenu() {
                                   padding: '0.45rem 0.85rem',
                                   borderRadius: '8px',
                                   fontSize: '0.85rem',
-                                  boxShadow: '0 8px 18px rgba(30, 64, 175, 0.2)'
+                                  boxShadow: '0 8px 18px rgba(17, 46, 135, 0.2)'
                                 }}
                               >
                                 Add
@@ -413,9 +413,9 @@ export default function VendorMenu() {
         bottom: 0,
         left: 0,
         right: 0,
-        borderTop: '1px solid #DBEAFE',
-        background: 'linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%)',
-        boxShadow: '0 -8px 24px rgba(30, 64, 175, 0.12)',
+        borderTop: '1px solid #FFE0C4',
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #FFF3E8 100%)',
+        boxShadow: '0 -8px 24px rgba(17, 46, 135, 0.12)',
         zIndex: 40
       }}>
         <div className="container p-4" style={{ display: 'flex', justifyContent: 'center' }}>
@@ -423,7 +423,7 @@ export default function VendorMenu() {
             onClick={() => navigate(`/menu/${vendorId}/cart`)}
             className="btn"
             style={{
-              background: 'linear-gradient(135deg, #1E40AF 0%, #1A3A8A 50%, #3B82F6 100%)',
+              background: 'linear-gradient(135deg, #112E87 0%, #0C2162 50%, #2A52BE 100%)',
               color: 'white',
               fontWeight: '700',
               border: 'none',

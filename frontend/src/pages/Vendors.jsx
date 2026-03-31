@@ -41,6 +41,7 @@ export default function Vendors() {
   }, []);
 
   const defaultPlayStoreUrl = process.env.REACT_APP_PLAYSTORE_URL || 'https://play.google.com/store/apps/details?id=com.rocketwheel.app';
+  const quickFilters = ['All', ...Object.keys(grouped).slice(0, 8)];
 
   useEffect(() => {
     if (banners.length === 0) return;
@@ -102,9 +103,11 @@ export default function Vendors() {
   }
 
   const filteredVendors = Object.keys(grouped).reduce((acc, cat) => {
+    const query = searchTerm.toLowerCase();
     const filtered = grouped[cat].filter(v => 
-      v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.address.toLowerCase().includes(searchTerm.toLowerCase())
+      v.name.toLowerCase().includes(query) ||
+      v.address.toLowerCase().includes(query) ||
+      cat.toLowerCase().includes(query)
     );
     if (filtered.length > 0) {
       acc[cat] = filtered;
@@ -135,7 +138,7 @@ export default function Vendors() {
     <div className="vendors-page">
       {/* Premium Header Section */}
       <div style={{
-        background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #1A3A8A 100%)',
+        background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 50%, #0C2162 100%)',
         color: 'white',
         padding: 'clamp(1rem, 4vw, 4rem) 0',
         position: 'sticky',
@@ -205,7 +208,7 @@ export default function Vendors() {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'white';
-                  e.currentTarget.style.color = '#1E40AF';
+                  e.currentTarget.style.color = '#112E87';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
@@ -220,7 +223,7 @@ export default function Vendors() {
                   padding: '0.875rem 1.75rem',
                   background: 'white',
                   border: '2px solid white',
-                  color: '#1E40AF',
+                  color: '#112E87',
                   borderRadius: '10px',
                   cursor: 'pointer',
                   fontWeight: '600',
@@ -229,7 +232,7 @@ export default function Vendors() {
                   letterSpacing: '0.5px'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#F0F9FF';
+                  e.currentTarget.style.background = '#FFF7ED';
                   e.currentTarget.style.transform = 'translateY(-2px)';
                   e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
                 }}
@@ -289,17 +292,50 @@ export default function Vendors() {
               </span>
             </div>
           </div>
+
+          <div style={{
+            display: 'flex',
+            gap: '0.6rem',
+            marginTop: '0.9rem',
+            overflowX: 'auto',
+            paddingBottom: '0.25rem'
+          }}>
+            {quickFilters.map((chip) => {
+              const active = chip === 'All' ? searchTerm.trim() === '' : searchTerm.toLowerCase() === chip.toLowerCase();
+              return (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => setSearchTerm(chip === 'All' ? '' : chip)}
+                  style={{
+                    border: active ? '1px solid #E83E6D' : '1px solid rgba(255,255,255,0.35)',
+                    background: active ? '#E83E6D' : 'rgba(255,255,255,0.14)',
+                    color: 'white',
+                    borderRadius: '999px',
+                    padding: '0.42rem 0.9rem',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    boxShadow: active ? '0 8px 20px rgba(232,62,109,0.35)' : 'none'
+                  }}
+                >
+                  {chip}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <div style={{
-        background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
-        borderBottom: '1px solid #DBEAFE'
+        background: 'linear-gradient(135deg, #F8FAFC 0%, #FFF3E8 100%)',
+        borderBottom: '1px solid #FFE0C4'
       }}>
         <div className="container" style={{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
           <div style={{
             background: 'white',
-            border: '1px solid #BFDBFE',
+            border: '1px solid #FFD1A1',
             borderRadius: '12px',
             padding: '1rem',
             display: 'flex',
@@ -309,7 +345,7 @@ export default function Vendors() {
             flexWrap: 'wrap'
           }}>
             <div>
-              <p style={{ margin: 0, color: '#1E3A8A', fontWeight: '700' }}>Customer Support</p>
+              <p style={{ margin: 0, color: '#B45309', fontWeight: '700' }}>Customer Support</p>
               <p style={{ margin: '0.3rem 0 0 0', color: '#475569', fontSize: '0.95rem' }}>
                 {supportPhone ? `Central Support Number: ${supportPhone}` : 'Support number will be updated soon'}
               </p>
@@ -320,7 +356,7 @@ export default function Vendors() {
                   href={`tel:${supportPhone}`}
                   style={{
                     textDecoration: 'none',
-                    background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                    background: 'linear-gradient(135deg, #E23744 0%, #112E87 100%)',
                     color: 'white',
                     borderRadius: '8px',
                     padding: '0.55rem 0.95rem',
@@ -357,12 +393,12 @@ export default function Vendors() {
       {banners.length > 0 && (
         <div style={{
           background: 'linear-gradient(135deg, #E0F2FE 0%, #FFFFFF 100%)',
-          borderTop: '1px solid #BFDBFE',
-          borderBottom: '1px solid #BFDBFE',
+          borderTop: '1px solid #FFD1A1',
+          borderBottom: '1px solid #FFD1A1',
           padding: '1rem 0'
         }}>
           <div className="container" style={{ padding: '0 1rem' }}>
-            <div style={{ marginBottom: '0.75rem', color: '#1E3A8A', fontWeight: '700' }}>
+            <div style={{ marginBottom: '0.75rem', color: '#B45309', fontWeight: '700' }}>
               Get RocketWheel App on Play Store
             </div>
             <div
@@ -417,13 +453,13 @@ export default function Vendors() {
                         width: '100%',
                         minWidth: '100%',
                         background: 'white',
-                        border: '1px solid #DBEAFE',
+                        border: '1px solid #FFE0C4',
                         borderRadius: '12px',
                         overflow: 'hidden',
-                        boxShadow: '0 8px 20px rgba(30, 64, 175, 0.08)'
+                        boxShadow: '0 8px 20px rgba(252, 128, 25, 0.08)'
                       }}
                     >
-                      <div style={{ height: '220px', background: '#EFF6FF' }}>
+                      <div style={{ height: '220px', background: '#FFF3E8' }}>
                         <div style={{ position: 'relative', width: '100%', height: '220px' }}>
                           <img
                             src={`${API}${b.imageUrl}`}
@@ -513,7 +549,7 @@ export default function Vendors() {
                       borderRadius: '999px',
                       border: 'none',
                       cursor: 'pointer',
-                      background: index === currentBanner ? '#1E40AF' : '#93C5FD',
+                      background: index === currentBanner ? '#112E87' : '#F5A524',
                       transition: 'all 220ms ease'
                     }}
                   />
@@ -558,8 +594,8 @@ export default function Vendors() {
           </div>
         ) : Object.keys(filteredVendors).length === 0 ? (
           <div style={{
-            background: 'linear-gradient(135deg, #EFF6FF 0%, #F0FAFF 100%)',
-            border: '2px solid #93C5FD',
+            background: 'linear-gradient(135deg, #FFF3E8 0%, #F0FAFF 100%)',
+            border: '2px solid #F5A524',
             borderRadius: '16px',
             padding: '3rem 2rem',
             textAlign: 'center'
@@ -579,7 +615,7 @@ export default function Vendors() {
                 <div style={{
                   width: '50px',
                   height: '50px',
-                  background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                  background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 100%)',
                   borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
@@ -608,22 +644,22 @@ export default function Vendors() {
                       className="vendors-card"
                       style={{
                         position: 'relative',
-                        borderTop: '4px solid #1E40AF'
+                        borderTop: '4px solid #112E87'
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-10px)';
-                        e.currentTarget.style.boxShadow = '0 30px 60px rgba(30, 64, 175, 0.2)';
+                        e.currentTarget.style.boxShadow = '0 30px 60px rgba(252, 128, 25, 0.2)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(30, 64, 175, 0.1)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(252, 128, 25, 0.1)';
                       }}
                     >
                       {/* Premium Header Banner / Photo */}
                       <div style={{
                         background: v.photo 
                           ? `url('${API}${v.photo}') center/cover` 
-                          : 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                          : 'linear-gradient(135deg, #112E87 0%, #2A52BE 100%)',
                         height: '140px',
                         position: 'relative',
                         display: 'flex',
@@ -715,7 +751,7 @@ export default function Vendors() {
                           onClick={() => navigate(`/menu/${v._id}`)}
                           style={{
                             width: '100%',
-                            background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                            background: 'linear-gradient(135deg, #112E87 0%, #2A52BE 100%)',
                             color: 'white',
                             border: 'none',
                             padding: '0.875rem',
@@ -728,7 +764,7 @@ export default function Vendors() {
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 12px 24px rgba(30, 64, 175, 0.3)';
+                            e.currentTarget.style.boxShadow = '0 12px 24px rgba(252, 128, 25, 0.3)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
@@ -754,7 +790,7 @@ export default function Vendors() {
         padding: '3rem 0',
         marginTop: '4rem',
         textAlign: 'center',
-        borderTop: '3px solid #1E40AF'
+        borderTop: '3px solid #112E87'
       }}>
         <div className="container">
           <div style={{
