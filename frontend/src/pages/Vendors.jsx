@@ -10,6 +10,7 @@ export default function Vendors() {
   const [banners, setBanners] = useState([]);
   const [supportPhone, setSupportPhone] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [isServiceUnavailable, setIsServiceUnavailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -31,11 +32,21 @@ export default function Vendors() {
         setBanners(bannersRes.data || []);
         setSupportPhone(supportRes.data?.phone || '');
         setLoadError('');
+        setIsServiceUnavailable(false);
       })
       .catch((err) => {
         console.error(err);
         setGrouped({});
-        setLoadError(err?.response?.data?.error || err?.message || 'Unable to load vendors right now.');
+        const status = err?.response?.status;
+        const serverMessage = err?.response?.data?.error || err?.message || 'Unable to load vendors right now.';
+        const dbDown = /database connection is down|temporarily unavailable|buffering timed out/i.test(serverMessage || '');
+        const isUnavailable = status === 503 || dbDown;
+        setIsServiceUnavailable(isUnavailable);
+        setLoadError(
+          isUnavailable
+            ? 'Service is temporarily unavailable. Please retry in a few moments.'
+            : serverMessage
+        );
       })
       .finally(() => setLoading(false));
   }, []);
@@ -345,7 +356,11 @@ export default function Vendors() {
             <div>
               <p style={{ margin: 0, color: '#B45309', fontWeight: '700' }}>Customer Support</p>
               <p style={{ margin: '0.3rem 0 0 0', color: '#475569', fontSize: '0.95rem' }}>
-                {supportPhone ? `Central Support Number: ${supportPhone}` : 'Support number will be updated soon'}
+                {supportPhone
+                  ? `Central Support Number: ${supportPhone}`
+                  : isServiceUnavailable
+                    ? 'Support details are temporarily unavailable. Please retry shortly.'
+                    : 'Support number will be updated soon'}
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
@@ -569,7 +584,7 @@ export default function Vendors() {
             textAlign: 'center'
           }}>
             <h3 style={{ color: '#B91C1C', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-              Unable to load vendors
+              {isServiceUnavailable ? 'Service temporarily unavailable' : 'Unable to load vendors'}
             </h3>
             <p style={{ color: '#7F1D1D', fontSize: '1rem', marginBottom: '1rem' }}>
               {loadError}

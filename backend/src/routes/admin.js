@@ -12,6 +12,7 @@ const DeliveryBoy = require('../models/DeliveryBoy');
 const Admin = require('../models/Admin');
 const Order = require('../models/Order');
 const Setting = require('../models/Setting');
+const requireDb = require('../middleware/requireDb');
 const { verifyToken, adminAuth } = require('../middleware/auth');
 const {
   buildVendorMenuUrl,
@@ -21,12 +22,6 @@ const {
 // Admin login
 router.post('/login', async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({
-        error: 'Database unavailable. Please allow this machine IP in MongoDB Atlas Network Access and try again.'
-      });
-    }
-
     const { email, password } = req.body;
     let admin = await Admin.findOne({ email });
     if (!admin) {
@@ -43,6 +38,8 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+router.use(requireDb);
 
 // List all vendors
 router.get('/vendors', verifyToken, adminAuth, async (req, res) => {

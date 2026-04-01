@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const Banner = require('../models/Banner');
 const Order = require('../models/Order');
 const Setting = require('../models/Setting');
+const requireDb = require('../middleware/requireDb');
 const {
   buildGlobalVendorsUrl,
   buildVendorMenuUrl,
@@ -18,7 +19,7 @@ async function getCentralSupportPhone() {
 }
 
 // Global vendors discovery grouped by category
-router.get('/vendors', async (req, res) => {
+router.get('/vendors', requireDb, async (req, res) => {
   try {
     const vendors = await Vendor.find({ approved: true, enabled: { $ne: false } }).select('-password').lean();
     const grouped = {};
@@ -33,7 +34,7 @@ router.get('/vendors', async (req, res) => {
 });
 
 // Vendor menu by id
-router.get('/vendors/:vendorId', async (req, res) => {
+router.get('/vendors/:vendorId', requireDb, async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.params.vendorId).select('-password').lean();
     if (!vendor || !vendor.approved || vendor.enabled === false) return res.status(404).json({ error: 'Vendor not available' });
@@ -48,7 +49,7 @@ router.get('/vendors/:vendorId', async (req, res) => {
 });
 
 // Active banners for public pages
-router.get('/banners', async (req, res) => {
+router.get('/banners', requireDb, async (req, res) => {
   try {
     const banners = await Banner.find({ active: true }).sort({ createdAt: -1 }).lean();
     res.json(banners);
@@ -58,7 +59,7 @@ router.get('/banners', async (req, res) => {
 });
 
 // Public customer support info
-router.get('/support', async (req, res) => {
+router.get('/support', requireDb, async (req, res) => {
   try {
     const phone = await getCentralSupportPhone();
     res.json({ phone });
@@ -91,7 +92,7 @@ router.get('/qr/vendor-direct/:vendorId', async (req, res) => {
 });
 
 // Vendor QR
-router.get('/qr/vendor/:vendorId', async (req, res) => {
+router.get('/qr/vendor/:vendorId', requireDb, async (req, res) => {
   try {
     const vendor = await Vendor.findById(req.params.vendorId);
     if (!vendor) return res.status(404).json({ error: 'Vendor not found' });
@@ -112,7 +113,7 @@ router.get('/qr/vendor/:vendorId', async (req, res) => {
 });
 
 // Place order (cart checkout)
-router.post('/orders', async (req, res) => {
+router.post('/orders', requireDb, async (req, res) => {
   try {
     const { vendorId, items, totalAmount, customerName, customerPhone, customerAddress } = req.body;
     const vendor = await Vendor.findById(vendorId);
@@ -138,7 +139,7 @@ router.post('/orders', async (req, res) => {
 });
 
 // Get order details
-router.get('/orders/:orderId', async (req, res) => {
+router.get('/orders/:orderId', requireDb, async (req, res) => {
   try {
     const order = await Order.findOne({ orderId: req.params.orderId }).populate('vendor', 'name category');
     if (!order) return res.status(404).json({ error: 'Order not found' });

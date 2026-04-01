@@ -5,13 +5,15 @@ const path = require('path');
 const fs = require('fs/promises');
 const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 const Vendor = require('../models/Vendor');
 const Product = require('../models/Product');
+const requireDb = require('../middleware/requireDb');
 const { verifyToken, vendorAuth } = require('../middleware/auth');
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+router.use(requireDb);
 
 const bulkUpload = multer({
   storage: multer.diskStorage({
@@ -64,12 +66,6 @@ router.post('/register', async (req, res) => {
 // Vendor login
 router.post('/login', async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({
-        error: 'Database unavailable. Please allow this machine IP in MongoDB Atlas Network Access and try again.'
-      });
-    }
-
     const { email, password } = req.body;
     const vendor = await Vendor.findOne({ email });
     if (!vendor || !(await vendor.comparePassword(password))) {
